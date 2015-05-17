@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--pure color-->
+    <color name="white">#ffffffff</color>
+    <color name="black">#ff000000</color>
+    <color name="transparent">#00000000</color>
+
+    <!--theme color-->
+    <color name="style_color_primary">#3474B4</color>
+    <color name="style_color_primary_dark">#0558A7</color>
+    <color name="style_color_primary_light">#7AB6F5</color>
+
+    <color name="style_color_accent">#FF4081</color>
+    <color name="style_text_color_secondary">#0558A7</color>
+    <color name="style_divider">#B6B6B6</color>
+    <color name="style_window_background">#E8EDF3</color>
+
+    <!--customized color-->
+    <color name="navigation_item_selected">#12000000</color>
+
+    <color name="login_banner_bg_color">@color/style_color_primary</color>
+    <color name="login_window_bg_color">#E8EDF3</color>
+    <color name="login_et_text_color">#666666</color>
+    <color name="login_btn_color_normal">@color/style_color_primary</color>
+    <color name="login_btn_color_selected">@color/style_color_primary_dark</color>
+
+    <color name="card_view_item_color_selected">#22666666</color>
+    <color name="card_view_item_color_normal">#00000000</color>
+
+    <color name="survey_title_text_color">#666666</color>
+    <color name="survey_time_text_color">#999999</color>
+
+</resources>

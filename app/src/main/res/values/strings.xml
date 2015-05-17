@@ -1,0 +1,57 @@
+<resources>
+    <string name="app_name">Questionnaire</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hello_world">Hello world!</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <!-- menu-->
+    <string name="action_settings">Settings</string>
+    <string name="action_refresh">Refresh</string>
+
+    <!-- activity title-->
+    <string name="title_activity_new_surveys">NewSurvey</string>
+    <string name="title_activity_survey">Survey</string>
+    <string name="title_activity_login">Login</string>
+
+    <!-- customized string -->
+    <string name="login_btn_text">Login</string>
+    <string name="login_et_hint_username">Username</string>
+    <string name="login_et_hint_password">Password</string>
+    <string name="login_progressbar_msg">Login...</string>
+    <string name="login_et_error_username_empty">Username is empty</string>
+    <string name="login_et_error_password_empty">Password is empty</string>
+    <string name="login_error_msg_wrong_username_or_password">Username or password is not correct</string>
+    <string name="login_error_exception">Login failed</string>
+
+    <string name="tab_survey_title">Survey</string>
+    <string name="tab_survey_setting">Settings</string>
+    <string name="survey_item_get_new_survey">Get New Surveys</string>
+    <string name="survey_item_unfinished">Unfinished Surveys</string>
+    <string name="survey_item_unuploaded">Upload Surveys</string>
+
+    <string name="text_select_all">Select All</string>
+    <string name="text_upload">Upload</string>
+
+    <string name="title_activity_personal_info">Personal Information</string>
+    <string name="title_activity_version_info">Version Information</string>
+    <string name="title_activity_about_us">About Us</string>
+
+    <string name="version_info_text">Version v</string>
+    <!--<string name="about_us_address">Address：Beijing fengtai district south 4th ring road no.186 Harvest international square 5th floor</string>-->
+    <string name="about_us_website">Website：http://industry.fang.com/</string>
+    <string name="about_us_email">Email：gaomeini@soufun.com</string>
+    <string name="about_us_qq">QQ：xxxxxxxx(QQ)</string>
+
+    <string name="personal_info_number">Number：</string>
+    <string name="personal_info_name">Name：</string>
+    <string name="personal_info_email">Email：</string>
+    <string name="personal_info_expiration_time">Authority Expiration Time：</string>
+
+    <string name="setting_fragment_exit_button">Exit</string>
+    <string name="title_activity_splash">SplashActivity</string>
+    <string name="title_activity_ques_manage">QuesManageActivity</string>
+</resources>

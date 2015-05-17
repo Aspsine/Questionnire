@@ -1,0 +1,51 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.fang.question.ui.fragment.LoginFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/login_banner_bg_color"
+        android:gravity="center_horizontal"
+        android:paddingBottom="16dp"
+        android:paddingTop="8dp">
+
+        <ImageView
+            android:id="@+id/ivBanner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:background="@mipmap/bg_login_banner" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/etUserName"
+        style="@style/StyleEditTextLogin"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/bg_login_shape_top"
+        android:drawableLeft="@mipmap/ic_login_edittext_phone"
+        android:hint="@string/login_et_hint_username" />
+
+    <EditText
+        android:id="@+id/etPassWord"
+        style="@style/StyleEditTextLogin"
+        android:background="@drawable/bg_login_shape_bottom"
+        android:drawableLeft="@mipmap/ic_login_edittext_password"
+        android:password="true"
+        android:hint="@string/login_et_hint_password" />
+
+    <Button
+        android:id="@+id/btnLogin"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/btn_login_selector"
+        android:text="@string/login_btn_text"
+        android:textColor="@color/white" />
+
+</LinearLayout>
