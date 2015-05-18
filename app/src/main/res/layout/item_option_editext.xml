@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.fang.chinaindex.questionnaire.ui.widget.CheckableLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/llOpen"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="8dp"
+    android:background="@drawable/bg_option_item_selector"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvOpen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="其他选项" />
+
+    <EditText
+        android:id="@+id/etOpen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</com.fang.chinaindex.questionnaire.ui.widget.CheckableLinearLayout>

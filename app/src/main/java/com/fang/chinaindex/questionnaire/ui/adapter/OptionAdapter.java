@@ -1,13 +1,19 @@
 package com.fang.chinaindex.questionnaire.ui.adapter;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckedTextView;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.fang.chinaindex.questionnaire.R;
 import com.fang.chinaindex.questionnaire.model.Option;
+import com.fang.chinaindex.questionnaire.ui.widget.CheckableLinearLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,14 +39,44 @@ public class OptionAdapter extends RecyclerViewAdapter {
         notifyDataSetChanged();
     }
 
+    public static final class TYPE {
+        public static final int NORMAL = 0;
+        public static final int OPEN = 1;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return mOptions.get(position).isOther() ? TYPE.OPEN : TYPE.NORMAL;
+    }
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new OptionTextViewHolder(inflate(parent, R.layout.item_option_text), mListener);
+        RecyclerView.ViewHolder holder;
+        switch (viewType) {
+            case TYPE.NORMAL:
+                holder = new OptionTextViewHolder(inflate(parent, R.layout.item_option_text), mListener);
+                break;
+            case TYPE.OPEN:
+                holder = new OpenOptionViewHolder(inflate(parent, R.layout.item_option_editext));
+                break;
+            default:
+                throw new IllegalArgumentException("wrong type");
+        }
+        return holder;
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ((OptionTextViewHolder) holder).bindData(mOptions.get(position));
+        int type = getItemViewType(position);
+        switch (type) {
+            case TYPE.NORMAL:
+                ((OptionTextViewHolder) holder).bindData(mOptions.get(position));
+                break;
+            case TYPE.OPEN:
+                ((OpenOptionViewHolder) holder).bindData(mOptions.get(position));
+                break;
+        }
+
     }
 
     @Override
@@ -95,6 +131,48 @@ public class OptionAdapter extends RecyclerViewAdapter {
                     notifyItemChanged(i);
                 }
             }
+        }
+    }
+
+    public static class OpenOptionViewHolder extends RecyclerView.ViewHolder implements TextWatcher {
+        CheckableLinearLayout cllOpen;
+        TextView tvOpen;
+        EditText etOpen;
+        Option mOption;
+
+        public OpenOptionViewHolder(View itemView) {
+            super(itemView);
+            cllOpen = (CheckableLinearLayout) itemView.findViewById(R.id.llOpen);
+            tvOpen = (TextView) itemView.findViewById(R.id.tvOpen);
+            etOpen = (EditText) itemView.findViewById(R.id.etOpen);
+            etOpen.addTextChangedListener(this);
+        }
+
+        public void bindData(Option option) {
+            mOption = option;
+            if (!mOption.isChecked()) {
+                mOption.setOpenAnswer("");
+            }
+            cllOpen.setChecked(mOption.isChecked());
+            tvOpen.setText(option.getOptionTitle());
+            etOpen.setText(option.getOpenAnswer());
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            mOption.setChecked(!TextUtils.isEmpty(s));
+            mOption.setOpenAnswer(String.valueOf(s));
+            cllOpen.setChecked(mOption.isChecked());
         }
     }
 

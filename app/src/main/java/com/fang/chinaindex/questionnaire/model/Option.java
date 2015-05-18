@@ -23,6 +23,8 @@ public class Option {
      */
     private boolean checked;
 
+    private String openAnswer;
+
     public String getId() {
         return id;
     }
@@ -69,5 +71,13 @@ public class Option {
 
     public void setChecked(boolean checked) {
         this.checked = checked;
+    }
+
+    public String getOpenAnswer() {
+        return openAnswer;
+    }
+
+    public void setOpenAnswer(String openAnswer) {
+        this.openAnswer = openAnswer;
     }
 }
