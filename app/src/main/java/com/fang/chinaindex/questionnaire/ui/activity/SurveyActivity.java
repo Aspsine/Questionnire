@@ -144,6 +144,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
     }
 
     private void showQuestion(Question question) {
+        changeControlButtons();
         QuestionBaseFragment questionFragment = null;
         switch (Integer.valueOf(question.getCategory())) {
             case TYPE.SINGLE:
@@ -231,7 +232,10 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
      * @param currentQuestion
      */
     private void goToNextIndexQuestion(Question currentQuestion) {
-        if (mCurrentPosition < mTemplateQuestions.size()) {
+        if (mCurrentPosition == mTemplateQuestions.size() - 1) {
+            saveQuestion(currentQuestion);
+            prepareUpload();
+        } else if (mCurrentPosition < mTemplateQuestions.size()) {
             saveQuestion(currentQuestion);
             showQuestion(mTemplateQuestions.get(++mCurrentPosition));
         } else {
@@ -269,7 +273,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
                 break;
             case LOGIC_TYPE.FINISH_SURVEY:
                 saveQuestion(currentQuestion);
-                showUpLoadDialog();
+                prepareUpload();
                 break;
         }
     }
@@ -277,10 +281,10 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
     private Logic getJumpLogic(List<Logic> logics) {
         Logic logic = null;
         for (Logic lgc : logics) {
-            for (int i=0; i<=mCurrentPosition;i++){
+            for (int i = 0; i <= mCurrentPosition; i++) {
                 Question question = mTemplateQuestions.get(i);
-                for (Option option : question.getOptions()){
-                    if(option.isChecked() && option.getId().equals(lgc.getSelectAnswer())){
+                for (Option option : question.getOptions()) {
+                    if (option.isChecked() && option.getId().equals(lgc.getSelectAnswer())) {
                         logic = lgc;
                         break;
                     }
@@ -306,9 +310,30 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         return checkedOptions;
     }
 
+    private void prepareUpload(){
+        showUpLoadDialog();
+    }
+
+    private void changeControlButtons(){
+        if (mCurrentPosition == 0){
+            btnNext.setVisibility(View.VISIBLE);
+            btnUp.setVisibility(View.GONE);
+        }else if(mCurrentPosition == mTemplateQuestions.size()-1){
+            btnUp.setVisibility(View.VISIBLE);
+            btnNext.setVisibility(View.VISIBLE);
+            btnNext.setText("提交");
+        }else {
+            btnUp.setVisibility(View.VISIBLE);
+            btnNext.setVisibility(View.VISIBLE);
+            btnNext.setText("下一题");
+        }
+    }
+
     private void showUpLoadDialog() {
         Toast.makeText(this, "it's time to upload!", Toast.LENGTH_SHORT).show();
     }
+
+
 
     /**
      * db save question
