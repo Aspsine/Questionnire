@@ -138,7 +138,7 @@ public class OptionAdapter extends RecyclerViewAdapter {
         CheckableLinearLayout cllOpen;
         TextView tvOpen;
         EditText etOpen;
-        Option mOption;
+        private Option mOption;
 
         public OpenOptionViewHolder(View itemView) {
             super(itemView);
@@ -154,8 +154,8 @@ public class OptionAdapter extends RecyclerViewAdapter {
                 mOption.setOpenAnswer("");
             }
             cllOpen.setChecked(mOption.isChecked());
-            tvOpen.setText(option.getOptionTitle());
-            etOpen.setText(option.getOpenAnswer());
+            tvOpen.setText(mOption.getOptionTitle());
+            etOpen.setText(mOption.getOpenAnswer());
         }
 
         @Override

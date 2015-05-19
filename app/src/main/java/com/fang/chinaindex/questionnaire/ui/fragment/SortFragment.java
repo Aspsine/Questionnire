@@ -14,7 +14,6 @@ import com.fang.chinaindex.questionnaire.model.Question;
  * A simple {@link Fragment} subclass.
  */
 public class SortFragment extends QuestionBaseFragment {
-    private Question mQuestion;
 
     public SortFragment() {
         // Required empty public constructor
@@ -23,7 +22,6 @@ public class SortFragment extends QuestionBaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mQuestion = getQuestion();
     }
 
     @Override
@@ -34,6 +32,5 @@ public class SortFragment extends QuestionBaseFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setQuestionTitle(mQuestion);
     }
 }

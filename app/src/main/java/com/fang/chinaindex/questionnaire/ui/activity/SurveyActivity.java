@@ -179,8 +179,15 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
     }
 
     private void showUpQuestion() {
-        if (mCurrentPosition > 0) {
-            mCurrentPosition--;
+        Question currentQuestion = mTemplateQuestions.get(mCurrentPosition);
+        L.i("SurveyActivity", "mCurrentPosition = " + mCurrentPosition);
+        List<Option> selectedOptions = getQuestionSelectedOptions(currentQuestion);
+        // true answered;
+        // false not answered;
+        boolean isCurrentQuestionBeenAnswered = selectedOptions.size() > 0;
+        if (isCurrentQuestionBeenAnswered) {
+            //回答了
+            saveQuestion(currentQuestion);
         }
     }
 
@@ -332,8 +339,6 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
     private void showUpLoadDialog() {
         Toast.makeText(this, "it's time to upload!", Toast.LENGTH_SHORT).show();
     }
-
-
 
     /**
      * db save question
