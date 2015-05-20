@@ -14,9 +14,10 @@ import com.fang.chinaindex.questionnaire.ui.adapter.OptionDragSortAdapter;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SortFragment extends QuestionBaseFragment {
-
+public class SortFragment extends QuestionBaseFragment implements OptionDragSortAdapter.OnItemMovedListener {
+    public static final String TAG = SortFragment.class.getSimpleName();
     private RecyclerView recyclerView;
+    private LinearLayoutManager mLayoutManager;
     private OptionDragSortAdapter mAdapter;
 
     public SortFragment() {
@@ -27,6 +28,7 @@ public class SortFragment extends QuestionBaseFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAdapter = new OptionDragSortAdapter();
+        mAdapter.setPositionChangedCallBack(this);
     }
 
     @Override
@@ -38,8 +40,8 @@ public class SortFragment extends QuestionBaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(layoutManager);
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setAdapter(mAdapter);
     }
 
@@ -54,4 +56,8 @@ public class SortFragment extends QuestionBaseFragment {
         super.onPause();
     }
 
+    @Override
+    public void onItemMoved(int from, int moveTo) {
+        recyclerView.scrollToPosition(moveTo);
+    }
 }

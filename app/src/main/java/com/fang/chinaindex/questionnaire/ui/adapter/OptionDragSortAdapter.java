@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.fang.chinaindex.questionnaire.R;
 import com.fang.chinaindex.questionnaire.model.Option;
+import com.fang.chinaindex.questionnaire.util.L;
 import com.h6ah4i.android.widget.advrecyclerview.utils.AbstractDraggableItemViewHolder;
 
 import java.util.ArrayList;
@@ -21,6 +22,13 @@ public class OptionDragSortAdapter extends RecyclerViewAdapter {
 
     private List<Option> mOptions;
 
+    private OnItemMovedListener mItemMovedListener;
+
+
+    public interface OnItemMovedListener {
+        void onItemMoved(int fromPos, int moveToPos);
+    }
+
     public OptionDragSortAdapter() {
         mOptions = new ArrayList<Option>();
     }
@@ -33,6 +41,10 @@ public class OptionDragSortAdapter extends RecyclerViewAdapter {
             option.setOptionTitle(i++ + "");
         }
         notifyDataSetChanged();
+    }
+
+    public void setPositionChangedCallBack(OnItemMovedListener listener) {
+        mItemMovedListener = listener;
     }
 
     @Override
@@ -61,30 +73,28 @@ public class OptionDragSortAdapter extends RecyclerViewAdapter {
     public void setChecked(int position) {
         Option option = mOptions.get(position);
         boolean isChecked = option.isChecked();
-        int divPos = getDividePosition();
-
+        mOptions.remove(position);
+        int firstUncheckedPos = getFirstUnCheckedPosition();
+        mOptions.add(firstUncheckedPos, option);
         option.setChecked(!isChecked);
-        mOptions.remove(option);
-//        notifyItemRemoved(position);
-        if (isChecked) {
-            divPos = divPos - 1;
-        }
-        mOptions.add(divPos, option);
-//        notifyItemInserted(divPos);
-        notifyItemMoved(position, divPos);
-        notifyItemRangeChanged(position <= divPos ? position : divPos, Math.abs(divPos - position) + 1);
+        L.i(TAG, "position = " + position);
+        L.i(TAG, "firstUncheckedPos = " + firstUncheckedPos);
+        L.i(TAG, "isChecked" + isChecked);
+        notifyItemMoved(position, firstUncheckedPos);
+        notifyItemRangeChanged(position <= firstUncheckedPos ? position : firstUncheckedPos,
+                Math.abs(position - firstUncheckedPos) + 1);
+        mItemMovedListener.onItemMoved(position, firstUncheckedPos);
     }
 
-    public interface PositionChangedCallBack {
-        void changed(int divPos);
-    }
 
-    public int getDividePosition() {
-        int i = 0;
-        while (i < mOptions.size() && mOptions.get(i).isChecked()) {
-            i++;
+    public int getFirstUnCheckedPosition() {
+        int size = mOptions.size();
+        for (int i = 0; i < size; i++) {
+            if (!mOptions.get(i).isChecked()) {
+                return i;
+            }
         }
-        return i;
+        return size;
     }
 
     public static class DragSortViewHolder extends AbstractDraggableItemViewHolder {
@@ -107,7 +117,7 @@ public class OptionDragSortAdapter extends RecyclerViewAdapter {
             ivDragHandler.setVisibility(mOption.isChecked() ? View.VISIBLE : View.GONE);
             tvNum.setVisibility(mOption.isChecked() ? View.VISIBLE : View.GONE);
             tvTitle.setText(mOption.getOptionTitle());
-            tvNum.setText(String.valueOf(getLayoutPosition()));
+            tvNum.setText(String.valueOf(getAdapterPosition()));
         }
     }
 
