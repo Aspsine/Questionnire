@@ -10,6 +10,9 @@ import android.view.View;
 
 import com.fang.chinaindex.questionnaire.R;
 import com.fang.chinaindex.questionnaire.ui.adapter.OptionDragSortAdapter;
+import com.h6ah4i.android.widget.advrecyclerview.animator.GeneralItemAnimator;
+import com.h6ah4i.android.widget.advrecyclerview.animator.RefactoredDefaultItemAnimator;
+import com.h6ah4i.android.widget.advrecyclerview.draggable.RecyclerViewDragDropManager;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -19,6 +22,8 @@ public class SortFragment extends QuestionBaseFragment implements OptionDragSort
     private RecyclerView recyclerView;
     private LinearLayoutManager mLayoutManager;
     private OptionDragSortAdapter mAdapter;
+    private RecyclerView.Adapter mWrappedAdapter;
+    private RecyclerViewDragDropManager mDragDropManager;
 
     public SortFragment() {
         // Required empty public constructor
@@ -28,7 +33,7 @@ public class SortFragment extends QuestionBaseFragment implements OptionDragSort
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAdapter = new OptionDragSortAdapter();
-        mAdapter.setPositionChangedCallBack(this);
+        mAdapter.setOnItemMovedListener(this);
     }
 
     @Override
@@ -41,8 +46,24 @@ public class SortFragment extends QuestionBaseFragment implements OptionDragSort
         super.onViewCreated(view, savedInstanceState);
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
         mLayoutManager = new LinearLayoutManager(getActivity());
+
+        // drag&drop manager
+        mDragDropManager = new RecyclerViewDragDropManager();
+
+        //TODO drawable
+
+        final OptionDragSortAdapter adapter = new OptionDragSortAdapter();
+        adapter.setOnItemMovedListener(this);
+        mAdapter = adapter;
+        mWrappedAdapter = mDragDropManager.createWrappedAdapter(adapter);
+
+        final GeneralItemAnimator animator = new RefactoredDefaultItemAnimator();
+
         recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setAdapter(mAdapter);
+        recyclerView.setAdapter(mWrappedAdapter);
+        recyclerView.setItemAnimator(animator);
+
+        mDragDropManager.attachRecyclerView(recyclerView);
     }
 
     @Override
@@ -53,6 +74,7 @@ public class SortFragment extends QuestionBaseFragment implements OptionDragSort
 
     @Override
     public void onPause() {
+        mDragDropManager.cancelDrag();
         super.onPause();
     }
 
