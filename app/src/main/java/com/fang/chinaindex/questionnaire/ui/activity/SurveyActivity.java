@@ -3,7 +3,6 @@ package com.fang.chinaindex.questionnaire.ui.activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -32,7 +31,7 @@ import java.util.List;
  *
  */
 public class SurveyActivity extends BaseActivity implements View.OnClickListener {
-
+    private static final String TAG = SurveyActivity.class.getSimpleName();
 
     private ProgressDialog pDialog;
     private Button btnUp, btnNext;
@@ -129,19 +128,17 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
     }
 
     private void initQuestion() {
-        Question question = null;
         if (mAnsweredQuestions.isEmpty()) {
             //1. 如果不存在则使用未答题
             mCurrentPosition = 0;
-            question = mTemplateQuestions.get(mCurrentPosition);
         } else {
             //2.如果存在已答题，则展示最后一道已答题在模板题库中的下一道题
             mCurrentPosition = calculatePosition();
             if (mCurrentPosition < mTemplateQuestions.size() - 1) {
-                question = mTemplateQuestions.get(++mCurrentPosition);
+                mCurrentPosition++;
             }
         }
-        showQuestion(question);
+        showQuestion(mTemplateQuestions.get(mCurrentPosition));
     }
 
     /**
@@ -177,19 +174,17 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
                 Toast.makeText(this, "unsupported Question TYPE(unknown)", Toast.LENGTH_SHORT).show();
                 return;
         }
-        if (mCurrentQuestionFragment == null) {
-            return;
-        }
-        mCurrentQuestionFragment.setQuestion(question);
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, mCurrentQuestionFragment)
-                .commit();
-        FragmentManager fm = getSupportFragmentManager();
 
+        if (mCurrentQuestionFragment != null) {
+            mCurrentQuestionFragment.setQuestion(question);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.container, mCurrentQuestionFragment)
+                    .commit();
+        }
     }
 
     private void showUpQuestion() {
-        // there no up question
+        // there is no up question
         if (mCurrentPosition <= 0) {
             return;
         }
@@ -202,7 +197,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         if (isCurrentQuestionBeenAnswered) {
             //回答了
             saveQuestion(currentQuestion);
-        }else {
+        } else {
             mAnsweredQuestionPositions.add(mCurrentPosition);
         }
         int currentPositionIndex = -1;
@@ -226,24 +221,13 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         // true answered;
         // false not answered;
         boolean isCurrentQuestionBeenAnswered = selectedOptions.size() > 0;
-        if (!Boolean.valueOf(currentQuestion.getIsMust())) {
-            //必答题
-            if (isCurrentQuestionBeenAnswered) {
-                //回答了
-                handlerAnsweredQuestion(currentQuestion);
-            } else {
-                //没回答
-                Toast.makeText(this, "此题是必答题.", Toast.LENGTH_SHORT).show();
-            }
+
+        if (isCurrentQuestionBeenAnswered) {
+            //回答了
+            handlerAnsweredQuestion(currentQuestion);
         } else {
-            //非必答
-            if (isCurrentQuestionBeenAnswered) {
-                //回答了
-                handlerAnsweredQuestion(currentQuestion);
-            } else {
-                //没回答
-                goToNextIndexQuestion(currentQuestion);
-            }
+            //没回答
+            handlerNotAnsweredQuestion(currentQuestion);
         }
     }
 
@@ -253,29 +237,74 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
      * @param currentQuestion
      */
     private void handlerAnsweredQuestion(Question currentQuestion) {
+        //保存问题
+        saveQuestion(currentQuestion);
         Logic logic = getJumpLogic(currentQuestion.getLogics());
         if (logic == null) {
-            goToNextIndexQuestion(currentQuestion);
+            uploadSurveyOrGoToNextIndexQuestion();
         } else {
             doLogicJump(currentQuestion, logic);
         }
     }
 
     /**
-     * 非逻辑跳转，进入下一题
+     * 处理未回答的问题
      *
      * @param currentQuestion
      */
-    private void goToNextIndexQuestion(Question currentQuestion) {
-        if (mCurrentPosition == mTemplateQuestions.size() - 1) {
+    private void handlerNotAnsweredQuestion(Question currentQuestion) {
+
+        if (!Boolean.valueOf(currentQuestion.getIsMust())) {
+            //必答题
+            Toast.makeText(this, "此题是必答题.", Toast.LENGTH_SHORT).show();
+        } else {
+            //非必答
+            //保存问题
             saveQuestion(currentQuestion);
+            uploadSurveyOrGoToNextIndexQuestion();
+        }
+    }
+
+    /**
+     * 上传问卷或进入下一题
+     */
+    private void uploadSurveyOrGoToNextIndexQuestion() {
+        if (isLastQuestionInTemplate()) {
             prepareUpload();
-        } else if (mCurrentPosition < mTemplateQuestions.size()) {
-            saveQuestion(currentQuestion);
-            showQuestion(mTemplateQuestions.get(++mCurrentPosition));
+        } else if (hasNextTemplateQuestion()) {
+            goToNextIndexQuestion();
         } else {
             throw new IllegalStateException("current position is bigger than size of the template questions!");
         }
+    }
+
+    /**
+     * 模版问卷中有没有下一题
+     *
+     * @return
+     */
+    private boolean hasNextTemplateQuestion() {
+        return mCurrentPosition < mTemplateQuestions.size();
+    }
+
+    /**
+     * 是否是模版问卷中的最后一题
+     *
+     * @return
+     */
+    private boolean isLastQuestionInTemplate() {
+        return mCurrentPosition == mTemplateQuestions.size() - 1;
+    }
+
+    private boolean isFirstQuestionInTemplate() {
+        return mCurrentPosition == 0;
+    }
+
+    /**
+     * 非逻辑跳转，进入下一题
+     */
+    private void goToNextIndexQuestion() {
+        showQuestion(mTemplateQuestions.get(++mCurrentPosition));
     }
 
     /**
@@ -285,7 +314,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
      * @param logic
      */
     private void doLogicJump(Question currentQuestion, Logic logic) {
-//        Toast.makeText(this, currentQuestion.getQuestionTitle() + " logic", Toast.LENGTH_SHORT).show();
+        L.i(TAG, "position = " + mCurrentPosition + " title = " + currentQuestion.getQuestionTitle() + " do logic");
         switch (Integer.valueOf(logic.getLogicType())) {
             case LOGIC_TYPE.SINGLE_JUMP:
                 String skipToQuestionId = logic.getSkipTo();
@@ -296,7 +325,6 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
                     }
                 }
                 if (mCurrentPosition < i) {
-                    saveQuestion(currentQuestion);
                     mCurrentPosition = i;
                     showQuestion(mTemplateQuestions.get(mCurrentPosition));
                 }
@@ -307,7 +335,6 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
                 finish();
                 break;
             case LOGIC_TYPE.FINISH_SURVEY:
-                saveQuestion(currentQuestion);
                 prepareUpload();
                 break;
         }
@@ -350,10 +377,10 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
     }
 
     private void changeControlButtons() {
-        if (mCurrentPosition == 0) {
+        if (isFirstQuestionInTemplate()) {
             btnNext.setVisibility(View.VISIBLE);
             btnUp.setVisibility(View.GONE);
-        } else if (mCurrentPosition == mTemplateQuestions.size() - 1) {
+        } else if (isLastQuestionInTemplate()) {
             btnUp.setVisibility(View.VISIBLE);
             btnNext.setVisibility(View.VISIBLE);
             btnNext.setText("提交");
