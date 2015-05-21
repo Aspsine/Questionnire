@@ -25,14 +25,14 @@
         android:id="@+id/etUserName"
         style="@style/StyleEditTextLogin"
         android:layout_marginTop="16dp"
-        android:background="@drawable/bg_login_shape_top"
+        android:background="@drawable/bg_login_top_shape"
         android:drawableLeft="@mipmap/ic_login_edittext_phone"
         android:hint="@string/login_et_hint_username" />
 
     <EditText
         android:id="@+id/etPassWord"
         style="@style/StyleEditTextLogin"
-        android:background="@drawable/bg_login_shape_bottom"
+        android:background="@drawable/bg_login_bottom_shape"
         android:drawableLeft="@mipmap/ic_login_edittext_password"
         android:password="true"
         android:hint="@string/login_et_hint_password" />
