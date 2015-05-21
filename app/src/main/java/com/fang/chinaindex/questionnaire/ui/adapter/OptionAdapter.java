@@ -125,7 +125,7 @@ public class OptionAdapter extends RecyclerViewAdapter {
         Option option = null;
         for (int i = 0, size = mOptions.size(); i < size; i++) {
             if (i != position) {
-                option = mOptions.get(position);
+                option = mOptions.get(i);
                 if (option.isChecked()) {
                     option.setChecked(false);
                     notifyItemChanged(i);

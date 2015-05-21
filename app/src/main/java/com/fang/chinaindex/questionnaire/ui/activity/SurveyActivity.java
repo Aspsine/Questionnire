@@ -3,7 +3,7 @@ package com.fang.chinaindex.questionnaire.ui.activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -42,6 +42,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
     private Survey mTemplateSurvey;
     private List<Question> mTemplateQuestions;
     private List<Question> mAnsweredQuestions;
+    private List<Integer> mAnsweredQuestionPositions;
     //    private Question mCurrentQuestion;
     private int mCurrentPosition = 0;
 
@@ -85,6 +86,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
 
     private void initAnsweredSurvey() {
         mAnsweredQuestions = new ArrayList<Question>();
+        mAnsweredQuestionPositions = new ArrayList<Integer>();
     }
 
     private void initTemplateSurvey() {
@@ -98,7 +100,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
                 showNextQuestion();
                 break;
             case R.id.btnUp:
-
+                showUpQuestion();
                 break;
         }
     }
@@ -127,7 +129,6 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
     }
 
     private void initQuestion() {
-
         Question question = null;
         if (mAnsweredQuestions.isEmpty()) {
             //1. 如果不存在则使用未答题
@@ -143,43 +144,56 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         showQuestion(question);
     }
 
+    /**
+     * container fragment of current question.
+     */
+    private QuestionBaseFragment mCurrentQuestionFragment = null;
+
     private void showQuestion(Question question) {
         changeControlButtons();
-        QuestionBaseFragment questionFragment = null;
         switch (Integer.valueOf(question.getCategory())) {
             case TYPE.SINGLE:
-                questionFragment = new SingleChoiceFragment();
+                mCurrentQuestionFragment = new SingleChoiceFragment();
                 break;
             case TYPE.MULTIPLE:
-                questionFragment = new MultiChoiceFragment();
+                mCurrentQuestionFragment = new MultiChoiceFragment();
                 break;
             case TYPE.MARK:
-                questionFragment = new SingleChoiceFragment();
+                mCurrentQuestionFragment = new SingleChoiceFragment();
                 break;
             case TYPE.TRUEORFALSE:
-                questionFragment = new SingleChoiceFragment();
+                mCurrentQuestionFragment = new SingleChoiceFragment();
                 break;
             case TYPE.OPEN:
-                questionFragment = new OpenFragment();
+                mCurrentQuestionFragment = new OpenFragment();
                 break;
             case TYPE.TEXT:
-
-                break;
+                Toast.makeText(this, "unsupported Question TYPE(6)", Toast.LENGTH_SHORT).show();
+                return;
             case TYPE.SORT:
-                questionFragment = new SortFragment();
+                mCurrentQuestionFragment = new SortFragment();
                 break;
+            default:
+                Toast.makeText(this, "unsupported Question TYPE(unknown)", Toast.LENGTH_SHORT).show();
+                return;
         }
-        if (questionFragment == null) {
+        if (mCurrentQuestionFragment == null) {
             return;
         }
-        questionFragment.setQuestion(question);
+        mCurrentQuestionFragment.setQuestion(question);
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, questionFragment)
+                .replace(R.id.container, mCurrentQuestionFragment)
                 .commit();
+        FragmentManager fm = getSupportFragmentManager();
+
     }
 
     private void showUpQuestion() {
-        Question currentQuestion = mTemplateQuestions.get(mCurrentPosition);
+        // there no up question
+        if (mCurrentPosition <= 0) {
+            return;
+        }
+        final Question currentQuestion = mTemplateQuestions.get(mCurrentPosition);
         L.i("SurveyActivity", "mCurrentPosition = " + mCurrentPosition);
         List<Option> selectedOptions = getQuestionSelectedOptions(currentQuestion);
         // true answered;
@@ -188,6 +202,20 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         if (isCurrentQuestionBeenAnswered) {
             //回答了
             saveQuestion(currentQuestion);
+        }else {
+            mAnsweredQuestionPositions.add(mCurrentPosition);
+        }
+        int currentPositionIndex = -1;
+        for (int i = 0; i < mAnsweredQuestionPositions.size(); i++) {
+            if (mCurrentPosition == mAnsweredQuestionPositions.get(i)) {
+                currentPositionIndex = i;
+                break;
+            }
+        }
+        if (currentPositionIndex != -1) {
+            int lastPositionIndex = --currentPositionIndex;
+            mCurrentPosition = mAnsweredQuestionPositions.get(lastPositionIndex);
+            showQuestion(mTemplateQuestions.get(mCurrentPosition));
         }
     }
 
@@ -257,7 +285,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
      * @param logic
      */
     private void doLogicJump(Question currentQuestion, Logic logic) {
-        Toast.makeText(this, currentQuestion.getQuestionTitle() + " logic", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, currentQuestion.getQuestionTitle() + " logic", Toast.LENGTH_SHORT).show();
         switch (Integer.valueOf(logic.getLogicType())) {
             case LOGIC_TYPE.SINGLE_JUMP:
                 String skipToQuestionId = logic.getSkipTo();
@@ -317,19 +345,19 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         return checkedOptions;
     }
 
-    private void prepareUpload(){
+    private void prepareUpload() {
         showUpLoadDialog();
     }
 
-    private void changeControlButtons(){
-        if (mCurrentPosition == 0){
+    private void changeControlButtons() {
+        if (mCurrentPosition == 0) {
             btnNext.setVisibility(View.VISIBLE);
             btnUp.setVisibility(View.GONE);
-        }else if(mCurrentPosition == mTemplateQuestions.size()-1){
+        } else if (mCurrentPosition == mTemplateQuestions.size() - 1) {
             btnUp.setVisibility(View.VISIBLE);
             btnNext.setVisibility(View.VISIBLE);
             btnNext.setText("提交");
-        }else {
+        } else {
             btnUp.setVisibility(View.VISIBLE);
             btnNext.setVisibility(View.VISIBLE);
             btnNext.setText("下一题");
@@ -347,6 +375,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
      */
     private void saveQuestion(Question currentQuestion) {
         mAnsweredQuestions.add(currentQuestion);
+        mAnsweredQuestionPositions.add(mCurrentPosition);
     }
 
     /**
