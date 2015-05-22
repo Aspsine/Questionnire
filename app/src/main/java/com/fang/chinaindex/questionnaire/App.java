@@ -5,6 +5,7 @@ import android.content.Context;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.fang.chinaindex.questionnaire.db.DBOpenHelper;
 import com.fang.chinaindex.questionnaire.repository.Repository;
 import com.fang.chinaindex.questionnaire.repository.RepositoryImpl;
 
@@ -22,6 +23,7 @@ public class App extends Application {
         super.onCreate();
         sContext = getApplicationContext();
         CrashHandler.getInstance(getApplicationContext());
+        DBOpenHelper.init(this);
     }
 
     /**

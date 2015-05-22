@@ -61,7 +61,7 @@ public class SharedPrefUtils {
     public static void saveUserInfo(Context c, UserInfo userInfo) {
         SharedPreferences sp = getDefaultSharedPreferences(c);
         SharedPreferences.Editor editor = sp.edit();
-        editor.putString(SHARED_PREF_USER_ID, userInfo.getUserId());
+        editor.putLong(SHARED_PREF_USER_ID, userInfo.getUserId());
         editor.putString(SHARED_PREF_USER_NAME, userInfo.getUserName());
         editor.putString(SHARED_PREF_USER_PERMISSION_END_TIME, userInfo.getPermissionEndTime());
         editor.putString(SHARED_PREF_USER_REAL_NAME, userInfo.getRealName());
@@ -78,8 +78,8 @@ public class SharedPrefUtils {
         editor.commit();
     }
 
-    public static String getUserId(Context c) {
-        return getDefaultSharedPreferences(c).getString(SHARED_PREF_USER_ID, "");
+    public static long getUserId(Context c) {
+        return getDefaultSharedPreferences(c).getLong(SHARED_PREF_USER_ID, 0);
     }
 
     public static String getUserName(Context c) {

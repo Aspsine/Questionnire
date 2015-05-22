@@ -2,7 +2,6 @@ package com.fang.chinaindex.questionnaire.ui.fragment;
 
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,6 +16,7 @@ import android.widget.Toast;
 
 import com.fang.chinaindex.questionnaire.App;
 import com.fang.chinaindex.questionnaire.R;
+import com.fang.chinaindex.questionnaire.db.UserDao;
 import com.fang.chinaindex.questionnaire.model.Login;
 import com.fang.chinaindex.questionnaire.model.UserInfo;
 import com.fang.chinaindex.questionnaire.repository.Repository;
@@ -79,10 +79,10 @@ public class LoginFragment extends BaseFragment implements View.OnClickListener 
         //2.判断权限是否过期
         //3.如果没过期则登陆
         //4.否则重新登陆
-        String userId = SharedPrefUtils.getUserId(getActivity());
+        long userId = SharedPrefUtils.getUserId(getActivity());
         String permissionEndTime = SharedPrefUtils.getUserPermissionEndTime(getActivity());
 
-        if (!TextUtils.isEmpty(userId)) {
+        if (userId != 0) {
             if (!TextUtils.isEmpty(permissionEndTime) && hasPermission(new Date(permissionEndTime))) {
                 intentToMain();
             } else {
@@ -132,6 +132,7 @@ public class LoginFragment extends BaseFragment implements View.OnClickListener 
     private void saveUserInfo(Login login) {
         UserInfo userInfo = login.getUserInfo();
         SharedPrefUtils.saveUserInfo(getActivity(), userInfo);
+        UserDao.getInstance().save(login.getUserInfo());
     }
 
     /**
@@ -139,7 +140,7 @@ public class LoginFragment extends BaseFragment implements View.OnClickListener 
      * @param passWord
      */
     private void login(String userName, String passWord) {
-        show();
+        show(getString(R.string.login_progressbar_msg));
         App.getRepository().Login(userName, passWord, new Repository.Callback<Login>() {
             @Override
             public void success(Login login) {

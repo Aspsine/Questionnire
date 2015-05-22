@@ -73,7 +73,7 @@ public class NewSurveysAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         @Override
         public void onClick(View v) {
             Intent intent = new Intent(v.getContext(), SurveyActivity.class);
-            intent.putExtra("EXTRA_SURVEY_ID", mInfo.getId());
+            intent.putExtra("EXTRA_SURVEY_ID", String.valueOf(mInfo.getSurveyId()));
             v.getContext().startActivity(intent);
         }
     }
