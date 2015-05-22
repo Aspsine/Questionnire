@@ -21,6 +21,16 @@ public class SurveyInfo {
     @SerializedName("sCompanyName")
     private String companyName;
 
+    /**
+     * 问卷开始回答时间
+     */
+    private String startTime;
+
+    /**
+     * 问卷回答结束时间
+     */
+    private String endTime;
+
     public String getId() {
         return id;
     }

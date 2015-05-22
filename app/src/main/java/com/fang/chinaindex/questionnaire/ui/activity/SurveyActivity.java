@@ -24,7 +24,6 @@ import com.fang.chinaindex.questionnaire.util.L;
 import com.fang.chinaindex.questionnaire.util.SharedPrefUtils;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -32,28 +31,38 @@ import java.util.List;
  */
 public class SurveyActivity extends BaseActivity implements View.OnClickListener {
     private static final String TAG = SurveyActivity.class.getSimpleName();
+    public static final String START_TIME_NONE = "start_time_none";
 
     private ProgressDialog pDialog;
     private Button btnUp, btnNext;
 
     private String mSurveyId;
+    /**
+     * start time of the survey
+     * <br/>
+     * if (mStartTime.equals(START_TIME_NONE)){
+     *      回答新问卷
+     * }else{
+     *     继续回答旧问卷
+     * }
+     */
+    private String mStartTime;
+
     private SurveyInfo mSurveyInfo;
     private Survey mTemplateSurvey;
     private List<Question> mTemplateQuestions;
-    private List<Question> mAnsweredQuestions;
     private List<Integer> mAnsweredQuestionPositions;
-    //    private Question mCurrentQuestion;
     private int mCurrentPosition = 0;
 
 
     public static final class TYPE {
-        static final int SINGLE = 1;   //单选题
-        static final int MULTIPLE = 2;   //多选题
-        static final int MARK = 3;   //打分题（单）
-        static final int TRUEORFALSE = 4;   //是非题（单）
-        static final int OPEN = 5;   //开放题
-        static final int TEXT = 6;   //文字描述题
-        static final int SORT = 7;   //排序题
+        public static final int SINGLE = 1;   //单选题
+        public static final int MULTIPLE = 2;   //多选题
+        public static final int MARK = 3;   //打分题（单）
+        public static final int TRUEORFALSE = 4;   //是非题（单）
+        public static final int OPEN = 5;   //开放题
+        public static final int TEXT = 6;   //文字描述题
+        public static final int SORT = 7;   //排序题
     }
 
     public static final class LOGIC_TYPE {
@@ -72,6 +81,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
         mSurveyId = intent.getStringExtra("EXTRA_SURVEY_ID");
+        mStartTime = intent.getStringExtra("EXTRA_SURVEY_START_TIME");
 
         btnNext = (Button) findViewById(R.id.btnNext);
         btnUp = (Button) findViewById(R.id.btnUp);
@@ -84,7 +94,6 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
     }
 
     private void initAnsweredSurvey() {
-        mAnsweredQuestions = new ArrayList<Question>();
         mAnsweredQuestionPositions = new ArrayList<Integer>();
     }
 
@@ -127,13 +136,19 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         });
     }
 
+    /**
+     * TODO 1: 从数据库中取出已答题目list，适配模板问卷list，将模板问卷恢复上一次答题的状态
+     * TODO 2: 得到mCurrentPosition 并 利用适配好的模板问卷list 来生成 mAnsweredQuestionPositions
+     */
     private void initQuestion() {
-        if (mAnsweredQuestions.isEmpty()) {
+        List<Question> answeredQuestion = new ArrayList<>();
+//                getAnsweredQuestionFromDB(mSurveyId,);
+        if (answeredQuestion.isEmpty()) {
             //1. 如果不存在则使用未答题
             mCurrentPosition = 0;
         } else {
             //2.如果存在已答题，则展示最后一道已答题在模板题库中的下一道题
-            mCurrentPosition = calculatePosition();
+            mCurrentPosition = calculatePosition(answeredQuestion);
             if (mCurrentPosition < mTemplateQuestions.size() - 1) {
                 mCurrentPosition++;
             }
@@ -183,6 +198,9 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         }
     }
 
+    /**
+     * 上一题
+     */
     private void showUpQuestion() {
         // there is no up question
         if (mCurrentPosition <= 0) {
@@ -214,12 +232,15 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         }
     }
 
+    /**
+     * 下一题/提交
+     */
     public void showNextQuestion() {
         Question currentQuestion = mTemplateQuestions.get(mCurrentPosition);
         L.i("SurveyActivity", "mCurrentPosition = " + mCurrentPosition);
         List<Option> selectedOptions = getQuestionSelectedOptions(currentQuestion);
-        // true answered;
-        // false not answered;
+
+        //true answered, false not answered;
         boolean isCurrentQuestionBeenAnswered = selectedOptions.size() > 0;
 
         if (isCurrentQuestionBeenAnswered) {
@@ -237,8 +258,15 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
      * @param currentQuestion
      */
     private void handlerAnsweredQuestion(Question currentQuestion) {
-        //保存问题
-        saveQuestion(currentQuestion);
+        //TODO 保存问题
+        // 1. 判断内存中该问题是否有该问题，如果有，更新该问题，并更新数据库。
+        // 2. 如果没有该问题，则将该问题加入内存列表，并插入数据库
+//        saveQuestion(currentQuestion);
+        if (mAnsweredQuestionPositions.contains(mCurrentPosition)) {
+
+        }
+
+
         Logic logic = getJumpLogic(currentQuestion.getLogics());
         if (logic == null) {
             uploadSurveyOrGoToNextIndexQuestion();
@@ -401,8 +429,8 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
      * @param currentQuestion
      */
     private void saveQuestion(Question currentQuestion) {
-        mAnsweredQuestions.add(currentQuestion);
         mAnsweredQuestionPositions.add(mCurrentPosition);
+        //TODO save to db
     }
 
     /**
@@ -417,12 +445,12 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
      *
      * @return
      */
-    private int calculatePosition() {
-        int answeredNum = mAnsweredQuestions.size();
+    private int calculatePosition(List<Question> answeredQuestion) {
+        int answeredNum = answeredQuestion.size();
         if (answeredNum <= 0) {
             return 0;
         }
-        Question lastAQuestion = mAnsweredQuestions.get(mAnsweredQuestions.size() - 1);
+        Question lastAQuestion = answeredQuestion.get(answeredQuestion.size() - 1);
         int totalNum = mTemplateQuestions.size();
         for (int i = 0; i < totalNum; i++) {
             if (lastAQuestion.getId().equals(mTemplateQuestions.get(i).getId())) {
@@ -433,46 +461,46 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
     }
 
 
-    private void buildQuestionWithAnswer(Question question) {
-        Question answeredQuestion = null;
-        for (Question a : mAnsweredQuestions) {
-            if (question.getId().equals(a.getId())) {
-                answeredQuestion = a;
-                break;
-            }
-        }
-        if (answeredQuestion == null) {
-            return;
-        }
-        List<Option> aOptions = answeredQuestion.getOptions();
-        List<Option> options = question.getOptions();
-        if (aOptions == null && aOptions.isEmpty()) {
-            return;
-        }
-        if (Integer.valueOf(question.getCategory()) == TYPE.SORT) {
-            for (Option ao : aOptions) {
-                ao.setChecked(true);
-                Iterator<Option> iterator = options.iterator();
-                while (iterator.hasNext()) {
-                    Option o = iterator.next();
-                    if (o.getId().equals(ao.getId())) {
-                        iterator.remove();
-                        break;
-                    }
-                }
-            }
-            options.addAll(0, aOptions);
-        } else {
-            for (Option ao : aOptions) {
-                for (Option o : options) {
-                    if (ao.getId().equals(o.getId())) {
-                        ao.setChecked(true);
-                        o.setChecked(true);
-                    }
-                }
-            }
-        }
-    }
+//    private void buildQuestionWithAnswer(Question question) {
+//        Question answeredQuestion = null;
+//        for (Question a : mAnsweredQuestions) {
+//            if (question.getId().equals(a.getId())) {
+//                answeredQuestion = a;
+//                break;
+//            }
+//        }
+//        if (answeredQuestion == null) {
+//            return;
+//        }
+//        List<Option> aOptions = answeredQuestion.getOptions();
+//        List<Option> options = question.getOptions();
+//        if (aOptions == null && aOptions.isEmpty()) {
+//            return;
+//        }
+//        if (Integer.valueOf(question.getCategory()) == TYPE.SORT) {
+//            for (Option ao : aOptions) {
+//                ao.setChecked(true);
+//                Iterator<Option> iterator = options.iterator();
+//                while (iterator.hasNext()) {
+//                    Option o = iterator.next();
+//                    if (o.getId().equals(ao.getId())) {
+//                        iterator.remove();
+//                        break;
+//                    }
+//                }
+//            }
+//            options.addAll(0, aOptions);
+//        } else {
+//            for (Option ao : aOptions) {
+//                for (Option o : options) {
+//                    if (ao.getId().equals(o.getId())) {
+//                        ao.setChecked(true);
+//                        o.setChecked(true);
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     private void show() {
         if (pDialog == null) {

@@ -84,9 +84,7 @@ public class OptionDragSortAdapter extends RecyclerView.Adapter<OptionDragSortAd
         int firstUncheckedPos = getFirstUnCheckedPosition();
         mOptions.add(firstUncheckedPos, option);
         option.setChecked(!isChecked);
-        L.i(TAG, "position = " + position);
-        L.i(TAG, "firstUncheckedPos = " + firstUncheckedPos);
-        L.i(TAG, "isChecked" + isChecked);
+        L.i(TAG, "position = " + position + " firstUncheckedPos = " + firstUncheckedPos + " isChecked=" + isChecked);
         notifyItemMoved(position, firstUncheckedPos);
         notifyItemRangeChanged(position <= firstUncheckedPos ? position : firstUncheckedPos,
                 Math.abs(position - firstUncheckedPos) + 1);
@@ -114,9 +112,9 @@ public class OptionDragSortAdapter extends RecyclerView.Adapter<OptionDragSortAd
         final int offsetX = containerView.getLeft() + (int) (ViewCompat.getTranslationX(containerView) + 0.5f);
         final int offsetY = containerView.getTop() + (int) (ViewCompat.getTranslationY(containerView) + 0.5f);
 
-        if (getFirstUnCheckedPosition()>0){
+        if (getFirstUnCheckedPosition() > 0) {
             return hitTest(dragHandleView, x - offsetX, y - offsetY);
-        }else {
+        } else {
             return false;
         }
     }

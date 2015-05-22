@@ -47,18 +47,26 @@ public abstract class QuestionBaseFragment extends Fragment {
         setQuestionTitle(mQuestion);
     }
 
-    public void setQuestionTitle(Question mQuestion) {
+    private void setQuestionTitle(Question mQuestion) {
         StringBuilder sb = new StringBuilder();
         sb.append("<strong>")
-                .append("<font color=\"#F5B961\">")
-                .append(Boolean.valueOf(mQuestion.getIsMust()) ? "" : "*")
-                .append("</font>")
                 .append("Q").append(mQuestion.getqNum()).append(".")
                 .append(mQuestion.getQuestionTitle())
                 .append("</strong>")
                 .append("<font color=\"#F5B961\">")
                 .append("[").append(mQuestion.getCategoryText()).append("]")
                 .append("</font>");
+        if (Integer.valueOf(mQuestion.getCategory()) == SurveyActivity.TYPE.MARK) {
+            sb.append("<br/>")
+                    .append("<br/>")
+                    .append("<small>")
+                    .append("<font color=\"#666666\">")
+                    .append("(")
+                    .append(mQuestion.getDescription())
+                    .append(")")
+                    .append("</font>")
+                    .append("</small>");
+        }
         tvQuestionTitle.setText(Html.fromHtml(sb.toString()));
     }
 
