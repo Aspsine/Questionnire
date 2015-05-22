@@ -16,7 +16,7 @@ public class Constants {
 
     public static final class DB{
         public static final String DATA_BASE_NAME = "Question";
-        public static final int DATA_BASE_VERSION = 0;
+        public static final int DATA_BASE_VERSION = 1;
     }
 
     public static final String EXTRA_INFO = "Extra_Info";
