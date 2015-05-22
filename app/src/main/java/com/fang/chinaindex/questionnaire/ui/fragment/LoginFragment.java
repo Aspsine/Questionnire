@@ -29,10 +29,8 @@ import java.util.Date;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class LoginFragment extends Fragment implements View.OnClickListener {
+public class LoginFragment extends BaseFragment implements View.OnClickListener {
     public static final String TAG = LoginFragment.class.getSimpleName();
-
-    private ProgressDialog pDialog;
 
     private ImageView ivBanner;
     private EditText etUserName;
@@ -77,9 +75,9 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        //1.若没过期判断userId是否为空
+        //1.判断userId是否为空
         //2.判断权限是否过期
-        //3.如果不为空则登陆
+        //3.如果没过期则登陆
         //4.否则重新登陆
         String userId = SharedPrefUtils.getUserId(getActivity());
         String permissionEndTime = SharedPrefUtils.getUserPermissionEndTime(getActivity());
@@ -176,19 +174,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         });
     }
 
-    private void show() {
-        Activity activity = getActivity();
-        if (pDialog == null && activity != null && !activity.isFinishing()) {
-            pDialog = new ProgressDialog(getActivity());
-            pDialog.setMessage(getString(R.string.login_progressbar_msg));
-        }
-        pDialog.show();
-    }
 
-    private void dismiss() {
-        if (pDialog != null && pDialog.isShowing()) {
-            pDialog.dismiss();
-        }
-    }
 
 }

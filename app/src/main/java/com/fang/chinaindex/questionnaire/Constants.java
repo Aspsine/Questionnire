@@ -14,6 +14,11 @@ public class Constants {
         public static final boolean DEBUG = true;
     }
 
+    public static final class DB{
+        public static final String DATA_BASE_NAME = "Question";
+        public static final int DATA_BASE_VERSION = 0;
+    }
+
     public static final String EXTRA_INFO = "Extra_Info";
     public static final String EXTRA_BEGIN_TIME = "Extra_BeginTime";
     public static final String SURVEY_STATUS = "Survey_Status";
