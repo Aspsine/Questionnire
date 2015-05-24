@@ -72,10 +72,10 @@ public class RepositoryImpl implements Repository {
     }
 
     @Override
-    public void getSurveyResults(long userId, final Callback<List<SurveyInfo>> callback) {
+    public void getSurveyResults(String userId, final Callback<List<SurveyInfo>> callback) {
         Map<String, String> params = new HashMap<String, String>();
         try {
-            String sUserId = DES.encryptDES(String.valueOf(userId), Constants.CONFIG.ENCRYPT_KEY);
+            String sUserId = DES.encryptDES(userId, Constants.CONFIG.ENCRYPT_KEY);
             params.put("iUserId", sUserId);
             params.put("encrypt", MD5.md5(userId + Constants.CONFIG.ENCRYPT_KEY));
         } catch (Exception e) {
@@ -110,7 +110,7 @@ public class RepositoryImpl implements Repository {
     }
 
     @Override
-    public void getSurveyDetails(long userId, String[] surveyIds, final Callback<List<Survey>> callback) {
+    public void getSurveyDetails(String userId, String[] surveyIds, final Callback<List<Survey>> callback) {
         StringBuilder sb = new StringBuilder();
         for (String id : surveyIds) {
             sb.append(id).append(",");
@@ -118,7 +118,7 @@ public class RepositoryImpl implements Repository {
         sb.deleteCharAt(sb.length() - 1);
         Map<String, String> params = new HashMap<String, String>();
         try {
-            String sUserId = DES.encryptDES(String.valueOf(userId), Constants.CONFIG.ENCRYPT_KEY);
+            String sUserId = DES.encryptDES(userId, Constants.CONFIG.ENCRYPT_KEY);
             String sSurveyIDs = DES.encryptDES(sb.toString(), Constants.CONFIG.ENCRYPT_KEY);
             params.put("iUserId", sUserId);
             params.put("ids", sSurveyIDs);
@@ -155,7 +155,7 @@ public class RepositoryImpl implements Repository {
     }
 
     @Override
-    public void uploadSample(long userId, Survey survey, Callback<UploadSampleResult> callback) {
+    public void uploadSample(String userId, Survey survey, Callback<UploadSampleResult> callback) {
 
     }
 

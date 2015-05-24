@@ -81,7 +81,8 @@ public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayo
             public void success(List<SurveyInfo> surveyInfos) {
                 swipeRefreshLayout.setRefreshing(false);
                 mAdapter.setData(surveyInfos);
-                SurveyInfoDao.getInstance().save(surveyInfos, String.valueOf(SharedPrefUtils.getUserId(getActivity())));
+//                UserSurveyInfoDao.getInstance().save();
+                SurveyInfoDao.getInstance().save(surveyInfos, SharedPrefUtils.getUserId(getActivity()));
                 getSurveys(surveyInfos);
             }
 

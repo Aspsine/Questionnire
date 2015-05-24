@@ -43,7 +43,7 @@ public class UserDao {
     }
 
     public synchronized void save(UserInfo userInfo) {
-        if (exist(userInfo.getUserId())) {
+        if (exist(String.valueOf(userInfo.getUserId()))) {
             updata(userInfo);
         } else {
             insert(userInfo);
@@ -62,9 +62,9 @@ public class UserDao {
         db.close();
     }
 
-    public synchronized void delete(long userId) {
+    public synchronized void delete(String userId) {
         SQLiteDatabase db = mHelper.getWritableDatabase();
-        db.delete(TABLE_NAME, "userId = ?", new String[]{String.valueOf(userId)});
+        db.delete(TABLE_NAME, "userId = ?", new String[]{userId});
         db.close();
     }
 
@@ -79,13 +79,13 @@ public class UserDao {
         db.close();
     }
 
-    public UserInfo getUser(long userId) {
+    public UserInfo getUser(String userId) {
         SQLiteDatabase db = mHelper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("Select * from " + TABLE_NAME + " where userId = ?", new String[]{String.valueOf(userId)});
+        Cursor cursor = db.rawQuery("Select * from " + TABLE_NAME + " where userId = ?", new String[]{userId});
         List<UserInfo> userInfos = new ArrayList<UserInfo>();
         while (cursor.moveToNext()) {
             UserInfo userInfo = new UserInfo();
-            userInfo.setUserId(cursor.getLong(cursor.getColumnIndex("userId")));
+            userInfo.setUserId(cursor.getString(cursor.getColumnIndex("userId")));
             userInfo.setUserName(cursor.getString(cursor.getColumnIndex("userName")));
             userInfo.setRealName(cursor.getString(cursor.getColumnIndex("realName")));
             userInfo.setEmail(cursor.getString(cursor.getColumnIndex("email")));
@@ -96,7 +96,7 @@ public class UserDao {
         return userInfos.size() > 0 ? userInfos.get(0) : null;
     }
 
-    public boolean exist(long userId) {
+    public boolean exist(String userId) {
         return getUser(userId) == null ? false : true;
     }
 

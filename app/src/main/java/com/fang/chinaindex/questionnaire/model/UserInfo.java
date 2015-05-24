@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  */
 public class UserInfo {
     @SerializedName("iUserID")
-    private long userId;
+    private String userId;
     @SerializedName("sUserName")
     private String userName;
     @SerializedName("dPermissionEndTime")
@@ -17,11 +17,11 @@ public class UserInfo {
     @SerializedName("sEmail")
     private String email;
 
-    public long getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(long userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 
