@@ -33,7 +33,6 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 
     void createTable(SQLiteDatabase db) {
         UserDao.createTable(db);
-        SurveyDao.createTable(db);
         SurveyInfoDao.createTable(db);
         QuestionDao.createTable(db);
         OptionDao.createTable(db);
@@ -42,7 +41,6 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 
     void dropTable(SQLiteDatabase db) {
         UserDao.dropTable(db);
-        SurveyDao.dropTable(db);
         SurveyInfoDao.dropTable(db);
         QuestionDao.dropTable(db);
         OptionDao.dropTable(db);

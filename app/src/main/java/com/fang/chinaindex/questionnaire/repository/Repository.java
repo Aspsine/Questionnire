@@ -11,6 +11,7 @@ import java.util.List;
  * Created by aspsine on 15-5-9.
  */
 public interface Repository {
+
     public void Login(String userName, String passWord, Callback<Login> callback);
 
     public void getSurveyResults(String userId, Callback<List<SurveyInfo>> callback);

@@ -1,9 +1,9 @@
-package com.fang.chinaindex.questionnaire.repository;
+package com.fang.chinaindex.questionnaire.repository.impl;
 
-import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -11,33 +11,37 @@ import com.android.volley.toolbox.StringRequest;
 import com.fang.chinaindex.questionnaire.App;
 import com.fang.chinaindex.questionnaire.Constants;
 import com.fang.chinaindex.questionnaire.model.Login;
+import com.fang.chinaindex.questionnaire.model.Option;
+import com.fang.chinaindex.questionnaire.model.Question;
 import com.fang.chinaindex.questionnaire.model.Survey;
+import com.fang.chinaindex.questionnaire.model.SurveyAnswer;
 import com.fang.chinaindex.questionnaire.model.SurveyDetails;
 import com.fang.chinaindex.questionnaire.model.SurveyInfo;
 import com.fang.chinaindex.questionnaire.model.SurveyResults;
 import com.fang.chinaindex.questionnaire.model.UploadSampleResult;
+import com.fang.chinaindex.questionnaire.repository.NetRepository;
 import com.fang.chinaindex.questionnaire.util.DES;
+import com.fang.chinaindex.questionnaire.util.DateUtils;
 import com.fang.chinaindex.questionnaire.util.L;
 import com.fang.chinaindex.questionnaire.util.MD5;
 import com.google.gson.Gson;
 
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Created by aspsine on 15-5-9.
+ * Created by Aspsine on 2015/5/25.
  */
-public class RepositoryImpl implements Repository {
-    private static final String TAG = RepositoryImpl.class.getSimpleName();
+public class NetRepositoryImpl implements NetRepository {
+    private static final String TAG = NetRepositoryImpl.class.getSimpleName();
     private Gson mGson;
-    private Context mContext;
 
-    public RepositoryImpl(Context context) {
-        this.mContext = context;
-        this.mGson = new Gson();
+    public NetRepositoryImpl(){
+        mGson = new Gson();
     }
 
     @Override
@@ -155,8 +159,74 @@ public class RepositoryImpl implements Repository {
     }
 
     @Override
-    public void uploadSample(String userId, Survey survey, Callback<UploadSampleResult> callback) {
+    public void uploadSample(final String userId, final Survey answeredSurvey, final Callback<UploadSampleResult> callback) {
+        String url = Constants.URL.UPLOAD_SAMPLE;
+        L.i(TAG, url);
+        StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
 
+            @Override
+            public void onResponse(String json) {
+                try {
+                    UploadSampleResult uploadSampleResult = mGson.fromJson(json, UploadSampleResult.class);
+                    if (TextUtils.isEmpty(uploadSampleResult.getErrorMessage())) {
+                        callback.success(uploadSampleResult);
+                    } else {
+                        callback.failure(new Exception(uploadSampleResult.getErrorMessage()));
+                    }
+                } catch (Exception e) {
+                    callback.failure(e);
+                }
+            }
+
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                callback.failure(volleyError);
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                String surveyId = String.valueOf(answeredSurvey.getInfo().getSurveyId());
+                String startTime = answeredSurvey.getInfo().getStartTime();
+                //TODO
+                String endTime = DateUtils.getStringFromTimeStamp(answeredSurvey.getInfo().getEndTime());
+
+                List<Question> questions = answeredSurvey.getQuestions();
+                List<SurveyAnswer> surveyAnswers = new ArrayList<SurveyAnswer>();
+                for (Question question : questions) {
+                        List<Option> answers = question.getOptions();
+                    for (Option answer : answers) {
+                        SurveyAnswer surveyAnswer = new SurveyAnswer();
+                        surveyAnswer.setISort(answer.getSort());
+                        //TODO
+//                        surveyAnswer.setDAddTime(ae);
+                        surveyAnswer.setIQuestionID(question.getQuestionId());
+                        surveyAnswer.setSAnswersNote(answer.getOpenAnswer());
+                        surveyAnswer.setSAnswers(answer.getId());
+                        surveyAnswers.add(surveyAnswer);
+                    }
+                }
+                try {
+                    String sUserId = DES.encryptDES(userId, Constants.CONFIG.ENCRYPT_KEY);
+                    String sSurveyId = DES.encryptDES(surveyId, Constants.CONFIG.ENCRYPT_KEY);
+                    String sStartTime = DES.encryptDES(startTime, Constants.CONFIG.ENCRYPT_KEY);
+                    String sEndTime = DES.encryptDES(endTime, Constants.CONFIG.ENCRYPT_KEY);
+                    String jsonAnswers = new Gson().toJson(surveyAnswers);
+                    params.put("iSurveyID", sSurveyId);
+                    params.put("iUserId", sUserId);
+                    params.put("dStart", sStartTime);
+                    params.put("dEnd", sEndTime);
+                    params.put("content_data", jsonAnswers);
+                    params.put("encrypt", MD5.md5(surveyId + userId + startTime + endTime + Constants.CONFIG.ENCRYPT_KEY));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                L.i(params.toString());
+                return params;
+            }
+        };
+        App.getRequestQueue().add(request);
     }
 
     public String createRequestUrl(String url, Map<String, String> params) {

@@ -7,7 +7,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.fang.chinaindex.questionnaire.db.DBOpenHelper;
 import com.fang.chinaindex.questionnaire.repository.Repository;
-import com.fang.chinaindex.questionnaire.repository.RepositoryImpl;
+import com.fang.chinaindex.questionnaire.repository.impl.RepositoryImpl;
 
 /**
  * Created by aspsine on 15-5-9.

@@ -103,7 +103,7 @@ public class SurveyInfoDao {
             Cursor cursor = db.rawQuery("Select * from " + TABLE_NAME + " where userId=?", new String[]{userId});
             while (cursor.moveToNext()) {
                 SurveyInfo surveyInfo = new SurveyInfo();
-                surveyInfo.setSurveyId(cursor.getLong(cursor.getColumnIndex("surveyId")));
+                surveyInfo.setSurveyId(cursor.getString(cursor.getColumnIndex("surveyId")));
                 surveyInfo.setTitle(cursor.getString(cursor.getColumnIndex("title")));
                 surveyInfo.setUpdateTime(cursor.getString(cursor.getColumnIndex("updateTime")));
                 surveyInfo.setCollectionEndTime(cursor.getString(cursor.getColumnIndex("collectionEndTime")));
@@ -123,7 +123,7 @@ public class SurveyInfoDao {
     public boolean exist(String surveyId, String userId) {
         List<SurveyInfo> surveyInfos = getSurveyInfos(userId);
         for (SurveyInfo surveyInfo : surveyInfos) {
-            if (surveyInfo.getSurveyId() == Long.valueOf(surveyId)) {
+            if (surveyInfo.getSurveyId().equals(surveyId)) {
                 return true;
             }
         }

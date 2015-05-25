@@ -79,10 +79,10 @@ public class LoginFragment extends BaseFragment implements View.OnClickListener 
         //2.判断权限是否过期
         //3.如果没过期则登陆
         //4.否则重新登陆
-        long userId = SharedPrefUtils.getUserId(getActivity());
+        String userId = SharedPrefUtils.getUserId(getActivity());
         String permissionEndTime = SharedPrefUtils.getUserPermissionEndTime(getActivity());
 
-        if (userId != 0) {
+        if (!TextUtils.isEmpty(userId)) {
             if (!TextUtils.isEmpty(permissionEndTime) && hasPermission(new Date(permissionEndTime))) {
                 intentToMain();
             } else {
