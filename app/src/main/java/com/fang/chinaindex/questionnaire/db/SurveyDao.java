@@ -1,16 +1,33 @@
 package com.fang.chinaindex.questionnaire.db;
 
-import android.database.sqlite.SQLiteDatabase;
+import com.fang.chinaindex.questionnaire.model.Survey;
 
 /**
+ * Survey = SurveyInfo+Questions
  * Created by Aspsine on 2015/5/22.
  */
 public class SurveyDao {
-    public static final void createTable(SQLiteDatabase db){
+
+    public void save(Survey survey, String userId) {
 
     }
 
-    public static final void dropTable(SQLiteDatabase db){
+    public void delete(String surveyId, String userId) {
 
     }
+
+    public void update() {
+
+    }
+
+    public void getSurveys() {
+
+    }
+
+    public void getSurvey() {
+
+    }
+
+
+
 }

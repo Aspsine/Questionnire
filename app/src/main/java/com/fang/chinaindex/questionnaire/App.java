@@ -23,7 +23,7 @@ public class App extends Application {
         super.onCreate();
         sContext = getApplicationContext();
         CrashHandler.getInstance(getApplicationContext());
-        DBOpenHelper.init(getApplicationContext());
+        DBOpenHelper.init(this);
     }
 
     /**

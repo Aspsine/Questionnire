@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName;
  */
 public class SurveyInfo {
     @SerializedName("iID")
-    private String id;
+    private String surveyId;
     @SerializedName("sTitle")
     private String title;
     @SerializedName("dUpdateTime")
@@ -31,12 +31,12 @@ public class SurveyInfo {
      */
     private String endTime;
 
-    public String getId() {
-        return id;
+    public String getSurveyId() {
+        return surveyId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setSurveyId(String surveyId) {
+        this.surveyId = surveyId;
     }
 
     public String getTitle() {
@@ -85,5 +85,21 @@ public class SurveyInfo {
 
     public void setCompanyName(String companyName) {
         this.companyName = companyName;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
     }
 }

@@ -16,14 +16,10 @@ import com.fang.chinaindex.questionnaire.model.SurveyDetails;
 import com.fang.chinaindex.questionnaire.model.SurveyInfo;
 import com.fang.chinaindex.questionnaire.model.SurveyResults;
 import com.fang.chinaindex.questionnaire.model.UploadSampleResult;
-import com.fang.chinaindex.questionnaire.model.UserInfo;
 import com.fang.chinaindex.questionnaire.util.DES;
 import com.fang.chinaindex.questionnaire.util.L;
 import com.fang.chinaindex.questionnaire.util.MD5;
 import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-
-import org.w3c.dom.Text;
 
 import java.net.URLEncoder;
 import java.util.HashMap;

@@ -2,11 +2,8 @@ package com.fang.chinaindex.questionnaire.repository;
 
 import com.fang.chinaindex.questionnaire.model.Login;
 import com.fang.chinaindex.questionnaire.model.Survey;
-import com.fang.chinaindex.questionnaire.model.SurveyDetails;
 import com.fang.chinaindex.questionnaire.model.SurveyInfo;
-import com.fang.chinaindex.questionnaire.model.SurveyResults;
 import com.fang.chinaindex.questionnaire.model.UploadSampleResult;
-import com.fang.chinaindex.questionnaire.model.UserInfo;
 
 import java.util.List;
 

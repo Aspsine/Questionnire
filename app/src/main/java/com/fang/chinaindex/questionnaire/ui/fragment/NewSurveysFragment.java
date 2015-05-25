@@ -12,9 +12,9 @@ import android.view.ViewGroup;
 
 import com.fang.chinaindex.questionnaire.App;
 import com.fang.chinaindex.questionnaire.R;
+import com.fang.chinaindex.questionnaire.db.SurveyInfoDao;
 import com.fang.chinaindex.questionnaire.model.Survey;
 import com.fang.chinaindex.questionnaire.model.SurveyInfo;
-import com.fang.chinaindex.questionnaire.model.SurveyResults;
 import com.fang.chinaindex.questionnaire.repository.Repository;
 import com.fang.chinaindex.questionnaire.ui.adapter.NewSurveysAdapter;
 import com.fang.chinaindex.questionnaire.util.SharedPrefUtils;
@@ -75,12 +75,14 @@ public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayo
     }
 
     private void refresh() {
-        show();
+        show("Caching...");
         App.getRepository().getSurveyResults(SharedPrefUtils.getUserId(getActivity()), new Repository.Callback<List<SurveyInfo>>() {
             @Override
             public void success(List<SurveyInfo> surveyInfos) {
                 swipeRefreshLayout.setRefreshing(false);
                 mAdapter.setData(surveyInfos);
+//                UserSurveyInfoDao.getInstance().save();
+                SurveyInfoDao.getInstance().save(surveyInfos, SharedPrefUtils.getUserId(getActivity()));
                 getSurveys(surveyInfos);
             }
 
@@ -96,7 +98,7 @@ public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayo
     private void getSurveys(List<SurveyInfo> surveyInfos) {
         String[] surveyIds = new String[surveyInfos.size()];
         for (int i = 0; i < surveyInfos.size(); i++) {
-            surveyIds[i] = surveyInfos.get(i).getId();
+            surveyIds[i] = String.valueOf(surveyInfos.get(i).getSurveyId());
         }
         App.getRepository().getSurveyDetails(SharedPrefUtils.getUserId(getActivity()), surveyIds, new Repository.Callback<List<Survey>>() {
             @Override
