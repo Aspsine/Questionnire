@@ -6,6 +6,8 @@ import android.content.Context;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.fang.chinaindex.questionnaire.db.DBOpenHelper;
+import com.fang.chinaindex.questionnaire.db.DaoSession;
+import com.fang.chinaindex.questionnaire.db.DaoMaster;
 import com.fang.chinaindex.questionnaire.repository.Repository;
 import com.fang.chinaindex.questionnaire.repository.impl.RepositoryImpl;
 
@@ -13,7 +15,7 @@ import com.fang.chinaindex.questionnaire.repository.impl.RepositoryImpl;
  * Created by aspsine on 15-5-9.
  */
 public class App extends Application {
-
+    private static DaoSession daoSession;
     private static RequestQueue sRequestQueue;
     private static Repository sRepository;
     private static Context sContext;
@@ -23,7 +25,17 @@ public class App extends Application {
         super.onCreate();
         sContext = getApplicationContext();
         CrashHandler.getInstance(getApplicationContext());
-        DBOpenHelper.init(this);
+        initDataBase();
+    }
+
+    private void initDataBase(){
+        DBOpenHelper dbOpenHelper = new DBOpenHelper(getApplicationContext());
+        DaoMaster daoMaster = new DaoMaster(dbOpenHelper.getWritableDatabase());
+        daoSession = daoMaster.newSession();
+    }
+
+    public static DaoSession getDaoSession(){
+        return daoSession;
     }
 
     /**

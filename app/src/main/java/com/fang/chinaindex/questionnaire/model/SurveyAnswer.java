@@ -10,6 +10,17 @@ public class SurveyAnswer {
     private String DAddTime;
     private String ISort;
 
+    public SurveyAnswer() {
+    }
+
+    public SurveyAnswer(String IQuestionID, String SAnswers, String SAnswersNote, String DAddTime, String ISort) {
+        this.IQuestionID = IQuestionID;
+        this.SAnswers = SAnswers;
+        this.SAnswersNote = SAnswersNote;
+        this.DAddTime = DAddTime;
+        this.ISort = ISort;
+    }
+
     public String getIQuestionID() {
         return IQuestionID;
     }

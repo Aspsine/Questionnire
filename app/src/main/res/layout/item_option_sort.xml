@@ -47,7 +47,6 @@
             android:layout_height="32dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="16dp"
-            android:background="@drawable/drag" />
+            android:layout_marginRight="16dp" />
     </RelativeLayout>
 </FrameLayout>

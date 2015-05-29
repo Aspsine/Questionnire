@@ -43,6 +43,8 @@ public class RepositoryImpl implements Repository {
 
     public RepositoryImpl(Context context) {
         this.mContext = context;
+        this.mCache = new CacheRepositoryImpl();
+        this.mNet = new NetRepositoryImpl();
     }
 
     @Override
@@ -118,8 +120,18 @@ public class RepositoryImpl implements Repository {
     }
 
     @Override
-    public void uploadSample(String userId, Survey survey, Callback<UploadSampleResult> callback) {
+    public void uploadSample(String userId, Survey survey, final Callback<UploadSampleResult> callback) {
+        mNet.uploadSample(userId, survey, new Callback<UploadSampleResult>() {
+            @Override
+            public void success(UploadSampleResult uploadSampleResult) {
+                callback.success(uploadSampleResult);
+            }
 
+            @Override
+            public void failure(Exception e) {
+                callback.failure(e);
+            }
+        });
     }
 
 

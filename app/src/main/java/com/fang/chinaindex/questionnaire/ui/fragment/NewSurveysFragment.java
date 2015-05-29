@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 
 import com.fang.chinaindex.questionnaire.App;
 import com.fang.chinaindex.questionnaire.R;
-import com.fang.chinaindex.questionnaire.db.SurveyInfoDao;
 import com.fang.chinaindex.questionnaire.model.Survey;
 import com.fang.chinaindex.questionnaire.model.SurveyInfo;
 import com.fang.chinaindex.questionnaire.repository.Repository;
@@ -82,7 +81,7 @@ public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayo
                 swipeRefreshLayout.setRefreshing(false);
                 mAdapter.setData(surveyInfos);
 //                UserSurveyInfoDao.getInstance().save();
-                SurveyInfoDao.getInstance().save(surveyInfos, SharedPrefUtils.getUserId(getActivity()));
+//                SurveyInfoDao.getInstance().save(surveyInfos, SharedPrefUtils.getUserId(getActivity()));
                 getSurveys(surveyInfos);
             }
 

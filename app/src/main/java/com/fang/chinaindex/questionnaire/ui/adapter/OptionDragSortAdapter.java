@@ -161,6 +161,8 @@ public class OptionDragSortAdapter extends RecyclerView.Adapter<OptionDragSortAd
             ivDragHandler = (ImageView) itemView.findViewById(R.id.ivDragHandle);
             tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
             tvNum = (TextView) itemView.findViewById(R.id.tvNum);
+
+            ivDragHandler.setBackgroundResource(R.mipmap.drag);
         }
 
         public void bindData(Option option) {

@@ -40,7 +40,7 @@ public class NetRepositoryImpl implements NetRepository {
     private static final String TAG = NetRepositoryImpl.class.getSimpleName();
     private Gson mGson;
 
-    public NetRepositoryImpl(){
+    public NetRepositoryImpl() {
         mGson = new Gson();
     }
 
@@ -141,7 +141,7 @@ public class NetRepositoryImpl implements NetRepository {
                     SurveyDetails details = mGson.fromJson(json, SurveyDetails.class);
                     if (details != null && TextUtils.isEmpty(details.getErrorMessage())) {
                         callback.success(details.getSurveys());
-                    }else{
+                    } else {
                         callback.failure(new Exception(details != null ? details.getErrorMessage() : "Sever error"));
                     }
                 } catch (Exception e) {
@@ -186,27 +186,20 @@ public class NetRepositoryImpl implements NetRepository {
         }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
-                String surveyId = String.valueOf(answeredSurvey.getInfo().getSurveyId());
-                String startTime = answeredSurvey.getInfo().getStartTime();
-                //TODO
-                String endTime = DateUtils.getStringFromTimeStamp(answeredSurvey.getInfo().getEndTime());
-
                 List<Question> questions = answeredSurvey.getQuestions();
                 List<SurveyAnswer> surveyAnswers = new ArrayList<SurveyAnswer>();
                 for (Question question : questions) {
-                        List<Option> answers = question.getOptions();
-                    for (Option answer : answers) {
-                        SurveyAnswer surveyAnswer = new SurveyAnswer();
-                        surveyAnswer.setISort(answer.getSort());
-                        //TODO
-//                        surveyAnswer.setDAddTime(ae);
-                        surveyAnswer.setIQuestionID(question.getQuestionId());
-                        surveyAnswer.setSAnswersNote(answer.getOpenAnswer());
-                        surveyAnswer.setSAnswers(answer.getId());
+                    List<Option> options = question.getOptions();
+                    for (Option option : options) {
+                        SurveyAnswer surveyAnswer = new SurveyAnswer(question.getQuestionId(), option.getId(), option.getOpenAnswer(), question.getAnsweredTime(), option.getSort());
                         surveyAnswers.add(surveyAnswer);
                     }
                 }
+
+                Map<String, String> params = new HashMap<String, String>();
+                String surveyId = answeredSurvey.getInfo().getSurveyId();
+                String startTime = DateUtils.getFormattedTime(answeredSurvey.getInfo().getStartTime());
+                String endTime = DateUtils.getFormattedTime(answeredSurvey.getInfo().getEndTime());
                 try {
                     String sUserId = DES.encryptDES(userId, Constants.CONFIG.ENCRYPT_KEY);
                     String sSurveyId = DES.encryptDES(surveyId, Constants.CONFIG.ENCRYPT_KEY);
@@ -222,7 +215,7 @@ public class NetRepositoryImpl implements NetRepository {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                L.i(params.toString());
+                L.i(TAG, params.toString());
                 return params;
             }
         };

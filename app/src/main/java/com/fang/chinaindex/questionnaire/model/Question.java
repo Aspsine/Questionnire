@@ -88,6 +88,12 @@ public class Question {
     private List<RecommendAnswer> recommendAnswers;
     private List<Logic> logics;
 
+    /**
+     * 上传问卷使用
+     * 答题时间（格式：2014-08-18 15:02:38）
+     */
+    private String answeredTime;
+
     public String getId() {
         return id;
     }
@@ -230,5 +236,13 @@ public class Question {
 
     public void setLogics(List<Logic> logics) {
         this.logics = logics;
+    }
+
+    public String getAnsweredTime() {
+        return answeredTime;
+    }
+
+    public void setAnsweredTime(String answeredTime) {
+        this.answeredTime = answeredTime;
     }
 }

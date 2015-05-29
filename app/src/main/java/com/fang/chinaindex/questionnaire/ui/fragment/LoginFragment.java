@@ -16,7 +16,6 @@ import android.widget.Toast;
 
 import com.fang.chinaindex.questionnaire.App;
 import com.fang.chinaindex.questionnaire.R;
-import com.fang.chinaindex.questionnaire.db.UserDao;
 import com.fang.chinaindex.questionnaire.model.Login;
 import com.fang.chinaindex.questionnaire.model.UserInfo;
 import com.fang.chinaindex.questionnaire.repository.Repository;
@@ -129,10 +128,14 @@ public class LoginFragment extends BaseFragment implements View.OnClickListener 
         getActivity().finish();
     }
 
+    /**
+     * save user info to db and sharedPref
+     * @param login
+     */
     private void saveUserInfo(Login login) {
         UserInfo userInfo = login.getUserInfo();
         SharedPrefUtils.saveUserInfo(getActivity(), userInfo);
-        UserDao.getInstance().save(login.getUserInfo());
+        App.getDaoSession().getUserDao().save(userInfo);
     }
 
     /**

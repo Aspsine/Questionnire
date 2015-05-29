@@ -1,11 +1,11 @@
-package com.fang.chinaindex.questionnaire.db;
+package com.fang.chinaindex.questionnaire.db.dao;
 
 import android.database.sqlite.SQLiteDatabase;
 
 /**
  * Created by Aspsine on 2015/5/22.
  */
-public class LogicDao {
+public class OptionDao {
     public static final void createTable(SQLiteDatabase db){
 
     }

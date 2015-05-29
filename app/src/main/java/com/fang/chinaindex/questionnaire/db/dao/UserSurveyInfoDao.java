@@ -1,9 +1,10 @@
-package com.fang.chinaindex.questionnaire.db;
+package com.fang.chinaindex.questionnaire.db.dao;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.fang.chinaindex.questionnaire.db.AbstractDao;
 import com.fang.chinaindex.questionnaire.model.UserSurveyInfo;
 import com.fang.chinaindex.questionnaire.util.SQLUtils;
 
@@ -13,15 +14,11 @@ import java.util.List;
 /**
  * Created by aspsine on 15/5/23.
  */
-public class UserSurveyInfoDao {
+public class UserSurveyInfoDao extends AbstractDao<UserSurveyInfoDao> {
 
     private static final String TABLE_NAME = "User_SurveyInfo";
 
     private static final String PARAMS = "userId long, surveyId long";
-
-    private static UserSurveyInfoDao sInstance;
-
-    private DBOpenHelper mHelper;
 
     public static final void createTable(SQLiteDatabase db) {
         db.execSQL(SQLUtils.createTable(TABLE_NAME, PARAMS));
@@ -31,15 +28,8 @@ public class UserSurveyInfoDao {
         db.execSQL(SQLUtils.dropTable(TABLE_NAME));
     }
 
-    public static UserSurveyInfoDao getInstance() {
-        if (sInstance == null) {
-            sInstance = new UserSurveyInfoDao();
-        }
-        return sInstance;
-    }
-
-    private UserSurveyInfoDao() {
-        mHelper = DBOpenHelper.getInstance();
+    public UserSurveyInfoDao(SQLiteDatabase db) {
+        super(db);
     }
 
     public void save(String userId, List<String> surveyIds) {
@@ -51,12 +41,10 @@ public class UserSurveyInfoDao {
     }
 
     public void insert(String userId, String surveyId) {
-        SQLiteDatabase db = mHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("userId", userId);
         values.put("surveyId", surveyId);
         db.insert(TABLE_NAME, null, values);
-        db.close();
     }
 
     public void insert(String userId, List<String> surveyIds) {
@@ -74,7 +62,6 @@ public class UserSurveyInfoDao {
     }
 
     public void insert(List<UserSurveyInfo> userSurveyInfos) {
-        SQLiteDatabase db = mHelper.getWritableDatabase();
         try {
             db.beginTransaction();
             ContentValues values = new ContentValues();
@@ -86,19 +73,14 @@ public class UserSurveyInfoDao {
         } finally {
             db.endTransaction();
         }
-        db.close();
     }
 
     public void deleteByUserId(String userId) {
-        SQLiteDatabase db = mHelper.getWritableDatabase();
         db.delete(TABLE_NAME, "userId = ?", new String[]{userId});
-        db.close();
     }
 
     public void deleteBySurveyId(String surveyId) {
-        SQLiteDatabase db = mHelper.getWritableDatabase();
         db.delete(TABLE_NAME, "survey = ?", new String[]{surveyId});
-        db.close();
     }
 
     public void update() {
@@ -106,7 +88,6 @@ public class UserSurveyInfoDao {
     }
 
     public List<String> getSurveyIdsByUserId(String userId) {
-        SQLiteDatabase db = mHelper.getReadableDatabase();
         List<String> surveyIds = new ArrayList<String>();
         db.beginTransaction();
         try {
@@ -119,7 +100,6 @@ public class UserSurveyInfoDao {
         } finally {
             db.endTransaction();
         }
-        db.close();
         return surveyIds;
     }
 

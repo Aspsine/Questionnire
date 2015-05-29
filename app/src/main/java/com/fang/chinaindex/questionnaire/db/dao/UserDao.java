@@ -1,9 +1,10 @@
-package com.fang.chinaindex.questionnaire.db;
+package com.fang.chinaindex.questionnaire.db.dao;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.fang.chinaindex.questionnaire.db.AbstractDao;
 import com.fang.chinaindex.questionnaire.model.UserInfo;
 import com.fang.chinaindex.questionnaire.util.SQLUtils;
 
@@ -13,15 +14,11 @@ import java.util.List;
 /**
  * Created by Aspsine on 2015/5/22.
  */
-public class UserDao {
+public class UserDao extends AbstractDao<UserInfo> {
 
     private static final String TABLE_NAME = "USER";
 
     private static final String PARAMS = "userId long, userName text, permissionEndTime text, realName text, email text";
-
-    private static UserDao sInstance;
-
-    private DBOpenHelper mHelper;
 
     public static final void createTable(SQLiteDatabase db) {
         db.execSQL(SQLUtils.createTable(TABLE_NAME, PARAMS));
@@ -31,15 +28,8 @@ public class UserDao {
         db.execSQL(SQLUtils.dropTable(TABLE_NAME));
     }
 
-    public static final UserDao getInstance() {
-        if (sInstance == null) {
-            sInstance = new UserDao();
-        }
-        return sInstance;
-    }
-
-    private UserDao() {
-        mHelper = DBOpenHelper.getInstance();
+    public UserDao(SQLiteDatabase db) {
+        super(db);
     }
 
     public synchronized void save(UserInfo userInfo) {
@@ -51,7 +41,6 @@ public class UserDao {
     }
 
     public synchronized void insert(UserInfo userInfo) {
-        SQLiteDatabase db = mHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("userId", userInfo.getUserId());
         values.put("userName", userInfo.getUserName());
@@ -59,28 +48,22 @@ public class UserDao {
         values.put("realName", userInfo.getRealName());
         values.put("email", userInfo.getEmail());
         db.insert(TABLE_NAME, null, values);
-        db.close();
     }
 
     public synchronized void delete(String userId) {
-        SQLiteDatabase db = mHelper.getWritableDatabase();
         db.delete(TABLE_NAME, "userId = ?", new String[]{userId});
-        db.close();
     }
 
     public void updata(UserInfo userInfo) {
-        SQLiteDatabase db = mHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("userName", userInfo.getUserName());
         values.put("permissionEndTime", userInfo.getPermissionEndTime());
         values.put("realName", userInfo.getRealName());
         values.put("email", userInfo.getEmail());
         db.update(TABLE_NAME, values, "userId=?", new String[]{String.valueOf(userInfo.getUserId())});
-        db.close();
     }
 
     public UserInfo getUser(String userId) {
-        SQLiteDatabase db = mHelper.getReadableDatabase();
         Cursor cursor = db.rawQuery("Select * from " + TABLE_NAME + " where userId = ?", new String[]{userId});
         List<UserInfo> userInfos = new ArrayList<UserInfo>();
         while (cursor.moveToNext()) {
@@ -92,7 +75,6 @@ public class UserDao {
             userInfo.setPermissionEndTime(cursor.getString(cursor.getColumnIndex("permissionEndTime")));
             userInfos.add(userInfo);
         }
-        db.close();
         return userInfos.size() > 0 ? userInfos.get(0) : null;
     }
 

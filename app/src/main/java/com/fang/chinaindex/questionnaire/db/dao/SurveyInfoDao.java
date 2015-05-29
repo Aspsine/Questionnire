@@ -1,9 +1,10 @@
-package com.fang.chinaindex.questionnaire.db;
+package com.fang.chinaindex.questionnaire.db.dao;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.fang.chinaindex.questionnaire.db.AbstractDao;
 import com.fang.chinaindex.questionnaire.model.SurveyInfo;
 import com.fang.chinaindex.questionnaire.util.SQLUtils;
 
@@ -13,15 +14,11 @@ import java.util.List;
 /**
  * Created by Aspsine on 2015/5/22.
  */
-public class SurveyInfoDao {
+public class SurveyInfoDao extends AbstractDao<SurveyInfo> {
 
     private static final String TABLE_NAME = "SurveyInfo";
 
     private static final String PARAMS = "surveyId long, title text, updateTime text, collectionEndTime text, typeId text, typeName text, companyName text, userId long";
-
-    private static SurveyInfoDao sInstance;
-
-    private DBOpenHelper mHelper;
 
     public static final void createTable(SQLiteDatabase db) {
         db.execSQL(SQLUtils.createTable(TABLE_NAME, PARAMS));
@@ -31,18 +28,11 @@ public class SurveyInfoDao {
         db.execSQL(SQLUtils.dropTable(TABLE_NAME));
     }
 
-    public static final SurveyInfoDao getInstance() {
-        if (sInstance == null) {
-            sInstance = new SurveyInfoDao();
-        }
-        return sInstance;
+    public SurveyInfoDao(SQLiteDatabase db) {
+        super(db);
     }
 
-    private SurveyInfoDao() {
-        mHelper = DBOpenHelper.getInstance();
-    }
-
-    public void save(List<SurveyInfo> surveyInfos, String userId) {
+    public void save(List<SurveyInfo> surveyInfos, String userId) throws Exception {
         if (exist(userId)) {
             deleteByUserId(userId);
             insert(surveyInfos, userId);
@@ -50,7 +40,6 @@ public class SurveyInfoDao {
     }
 
     public void insert(List<SurveyInfo> surveyInfos, String userId) {
-        SQLiteDatabase db = mHelper.getWritableDatabase();
         db.beginTransaction();
         try {
             ContentValues contentValues = new ContentValues();
@@ -62,42 +51,30 @@ public class SurveyInfoDao {
         } finally {
             db.endTransaction();
         }
-        db.close();
     }
 
     public void insert(SurveyInfo surveyInfo, String userId) {
-        SQLiteDatabase db = mHelper.getWritableDatabase();
         db.insert(TABLE_NAME, null, getContentValues(surveyInfo, userId, null, false));
-        db.close();
     }
 
     public void delete(String surveyId, String userId) {
-        SQLiteDatabase db = mHelper.getWritableDatabase();
         db.delete(TABLE_NAME, "surveyId=?, userId=?", new String[]{surveyId, userId});
-        db.close();
     }
 
     public void deleteByUserId(String userId) {
-        SQLiteDatabase db = mHelper.getWritableDatabase();
         db.delete(TABLE_NAME, "userId=?", new String[]{userId});
-        db.close();
     }
 
     private void deleteBySurveyId(String surveyId) {
-        SQLiteDatabase db = mHelper.getWritableDatabase();
         db.delete(TABLE_NAME, "surveyId=?", new String[]{surveyId});
-        db.close();
     }
 
     private void update(SurveyInfo surveyInfo, String userId) {
-        SQLiteDatabase db = mHelper.getWritableDatabase();
         db.update(TABLE_NAME, getContentValues(surveyInfo, userId, null, false), "userId=?", new String[]{userId});
-        db.close();
     }
 
-    private List<SurveyInfo> getSurveyInfos(String userId) {
+    public List<SurveyInfo> getSurveyInfos(String userId){
         List<SurveyInfo> surveyInfos = new ArrayList<SurveyInfo>();
-        SQLiteDatabase db = mHelper.getReadableDatabase();
         db.beginTransaction();
         try {
             Cursor cursor = db.rawQuery("Select * from " + TABLE_NAME + " where userId=?", new String[]{userId});
@@ -116,11 +93,10 @@ public class SurveyInfoDao {
         } finally {
             db.endTransaction();
         }
-        db.close();
         return surveyInfos;
     }
 
-    public boolean exist(String surveyId, String userId) {
+    public boolean exist(String surveyId, String userId) throws Exception {
         List<SurveyInfo> surveyInfos = getSurveyInfos(userId);
         for (SurveyInfo surveyInfo : surveyInfos) {
             if (surveyInfo.getSurveyId().equals(surveyId)) {
@@ -130,7 +106,7 @@ public class SurveyInfoDao {
         return false;
     }
 
-    public boolean exist(String userId) {
+    public boolean exist(String userId) throws Exception {
         List<SurveyInfo> surveyInfos = getSurveyInfos(userId);
         return surveyInfos.size() > 0;
     }

@@ -1,4 +1,4 @@
-package com.fang.chinaindex.questionnaire.db;
+package com.fang.chinaindex.questionnaire.db.dao;
 
 import com.fang.chinaindex.questionnaire.model.Survey;
 

@@ -1,4 +1,4 @@
-package com.fang.chinaindex.questionnaire.db;
+package com.fang.chinaindex.questionnaire.db.dao;
 
 import android.database.sqlite.SQLiteDatabase;
 
