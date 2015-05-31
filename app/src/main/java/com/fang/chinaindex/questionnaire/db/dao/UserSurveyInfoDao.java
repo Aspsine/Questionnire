@@ -5,7 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.fang.chinaindex.questionnaire.db.AbstractDao;
-import com.fang.chinaindex.questionnaire.model.UserSurveyInfo;
+import com.fang.chinaindex.questionnaire.model.SurveyInfo;
 import com.fang.chinaindex.questionnaire.util.SQLUtils;
 
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ public class UserSurveyInfoDao extends AbstractDao<UserSurveyInfoDao> {
 
     private static final String TABLE_NAME = "User_SurveyInfo";
 
-    private static final String PARAMS = "userId long, surveyId long";
+    private static final String PARAMS = "_id integer primary key autoincrement, userId long, surveyId long";
 
     public static final void createTable(SQLiteDatabase db) {
         db.execSQL(SQLUtils.createTable(TABLE_NAME, PARAMS));
@@ -32,48 +32,22 @@ public class UserSurveyInfoDao extends AbstractDao<UserSurveyInfoDao> {
         super(db);
     }
 
-    public void save(String userId, List<String> surveyIds) {
+    public void save(String userId, List<SurveyInfo> surveyInfos) {
         if (existByUserId(userId)) {
             deleteByUserId(userId);
         } else {
-            insert(userId, surveyIds);
+            insert(userId, surveyInfos);
         }
     }
 
-    public void insert(String userId, String surveyId) {
+    public void insert(String userId, List<SurveyInfo> surveyInfos) {
         ContentValues values = new ContentValues();
-        values.put("userId", userId);
-        values.put("surveyId", surveyId);
-        db.insert(TABLE_NAME, null, values);
-    }
-
-    public void insert(String userId, List<String> surveyIds) {
-        List<UserSurveyInfo> userSurveyInfos = new ArrayList<UserSurveyInfo>();
-        for (String surveyId : surveyIds) {
-            userSurveyInfos.add(new UserSurveyInfo(userId, surveyId));
-        }
-        insert(userSurveyInfos);
-    }
-
-    public void insert(UserSurveyInfo userSurveyInfo) {
-        String userId = userSurveyInfo.getUserId();
-        String surveyId = userSurveyInfo.getSurveyId();
-        insert(userId, surveyId);
-    }
-
-    public void insert(List<UserSurveyInfo> userSurveyInfos) {
-        try {
-            db.beginTransaction();
-            ContentValues values = new ContentValues();
-            for (UserSurveyInfo userSurveyInfo : userSurveyInfos) {
-                db.insert(TABLE_NAME, null, getContentValues(userSurveyInfo, values, true));
-                values.clear();
-            }
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
+        for (SurveyInfo surveyInfo : surveyInfos) {
+            db.insert(TABLE_NAME, null, getContentValues(userId, surveyInfo.getSurveyId(), values, true));
+            values.clear();
         }
     }
+
 
     public void deleteByUserId(String userId) {
         db.delete(TABLE_NAME, "userId = ?", new String[]{userId});
@@ -107,10 +81,10 @@ public class UserSurveyInfoDao extends AbstractDao<UserSurveyInfoDao> {
         return getSurveyIdsByUserId(userId).size() > 0;
     }
 
-    private ContentValues getContentValues(UserSurveyInfo userSurveyInfo, ContentValues contentValues, boolean userCache) {
+    private ContentValues getContentValues(String userId, String surveyId, ContentValues contentValues, boolean userCache) {
         ContentValues values = userCache ? contentValues : new ContentValues();
-        values.put("userId", userSurveyInfo.getUserId());
-        values.put("surveyId", userSurveyInfo.getSurveyId());
+        values.put("userId", userId);
+        values.put("surveyId", surveyId);
         return values;
     }
 

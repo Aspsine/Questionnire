@@ -18,7 +18,7 @@ public class SurveyInfoDao extends AbstractDao<SurveyInfo> {
 
     private static final String TABLE_NAME = "SurveyInfo";
 
-    private static final String PARAMS = "surveyId long, title text, updateTime text, collectionEndTime text, typeId text, typeName text, companyName text, userId long";
+    private static final String PARAMS = "_id integer autoincrement, surveyId long primary key, title text, updateTime text, collectionEndTime text, typeId text, typeName text, companyName text";
 
     public static final void createTable(SQLiteDatabase db) {
         db.execSQL(SQLUtils.createTable(TABLE_NAME, PARAMS));
@@ -32,46 +32,47 @@ public class SurveyInfoDao extends AbstractDao<SurveyInfo> {
         super(db);
     }
 
-    public void save(List<SurveyInfo> surveyInfos, String userId) throws Exception {
-        if (exist(userId)) {
-            deleteByUserId(userId);
-            insert(surveyInfos, userId);
-        }
-    }
-
-    public void insert(List<SurveyInfo> surveyInfos, String userId) {
-        db.beginTransaction();
-        try {
+    public void replace(List<SurveyInfo> surveyInfos) {
+        for (SurveyInfo surveyInfo : surveyInfos) {
             ContentValues contentValues = new ContentValues();
-            for (SurveyInfo surveyInfo : surveyInfos) {
-                db.insert(TABLE_NAME, null, getContentValues(surveyInfo, userId, contentValues, true));
-                contentValues.clear();
-            }
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
+            db.replace(TABLE_NAME, null, getContentValues(surveyInfo, contentValues, true));
+            contentValues.clear();
         }
     }
-
-    public void insert(SurveyInfo surveyInfo, String userId) {
-        db.insert(TABLE_NAME, null, getContentValues(surveyInfo, userId, null, false));
-    }
-
-    public void delete(String surveyId, String userId) {
-        db.delete(TABLE_NAME, "surveyId=?, userId=?", new String[]{surveyId, userId});
-    }
-
-    public void deleteByUserId(String userId) {
-        db.delete(TABLE_NAME, "userId=?", new String[]{userId});
-    }
-
-    private void deleteBySurveyId(String surveyId) {
-        db.delete(TABLE_NAME, "surveyId=?", new String[]{surveyId});
-    }
-
-    private void update(SurveyInfo surveyInfo, String userId) {
-        db.update(TABLE_NAME, getContentValues(surveyInfo, userId, null, false), "userId=?", new String[]{userId});
-    }
+//
+//    public void insert(List<SurveyInfo> surveyInfos) {
+//        db.beginTransaction();
+//        try {
+//            ContentValues contentValues = new ContentValues();
+//            for (SurveyInfo surveyInfo : surveyInfos) {
+//                db.insert(TABLE_NAME, null, getContentValues(surveyInfo, contentValues, true));
+//                contentValues.clear();
+//            }
+//            db.setTransactionSuccessful();
+//        } finally {
+//            db.endTransaction();
+//        }
+//    }
+//
+//    public void insert(SurveyInfo surveyInfo, String userId) {
+//        db.insert(TABLE_NAME, null, getContentValues(surveyInfo, null, false));
+//    }
+//
+//    public void delete(String surveyId, String userId) {
+//        db.delete(TABLE_NAME, "surveyId=?, userId=?", new String[]{surveyId, userId});
+//    }
+//
+//    public void deleteByUserId(String userId) {
+//        db.delete(TABLE_NAME, "userId=?", new String[]{userId});
+//    }
+//
+//    private void deleteBySurveyId(String surveyId) {
+//        db.delete(TABLE_NAME, "surveyId=?", new String[]{surveyId});
+//    }
+//
+//    private void update(SurveyInfo surveyInfo, String userId) {
+//        db.update(TABLE_NAME, getContentValues(surveyInfo, null, false), "userId=?", new String[]{userId});
+//    }
 
     public List<SurveyInfo> getSurveyInfos(String userId){
         List<SurveyInfo> surveyInfos = new ArrayList<SurveyInfo>();
@@ -96,22 +97,22 @@ public class SurveyInfoDao extends AbstractDao<SurveyInfo> {
         return surveyInfos;
     }
 
-    public boolean exist(String surveyId, String userId) throws Exception {
-        List<SurveyInfo> surveyInfos = getSurveyInfos(userId);
-        for (SurveyInfo surveyInfo : surveyInfos) {
-            if (surveyInfo.getSurveyId().equals(surveyId)) {
-                return true;
-            }
-        }
-        return false;
-    }
+//    public boolean exist(String surveyId, String userId) throws Exception {
+//        List<SurveyInfo> surveyInfos = getSurveyInfos(userId);
+//        for (SurveyInfo surveyInfo : surveyInfos) {
+//            if (surveyInfo.getSurveyId().equals(surveyId)) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+//
+//    public boolean exist(String userId){
+//        List<SurveyInfo> surveyInfos = getSurveyInfos(userId);
+//        return surveyInfos.size() > 0;
+//    }
 
-    public boolean exist(String userId) throws Exception {
-        List<SurveyInfo> surveyInfos = getSurveyInfos(userId);
-        return surveyInfos.size() > 0;
-    }
-
-    private ContentValues getContentValues(SurveyInfo surveyInfo, String userId, ContentValues contentValues, boolean userCache) {
+    private ContentValues getContentValues(SurveyInfo surveyInfo, ContentValues contentValues, boolean userCache) {
         ContentValues values = userCache ? contentValues : new ContentValues();
         values.put("surveyId", surveyInfo.getSurveyId());
         values.put("title", surveyInfo.getTitle());
@@ -120,7 +121,6 @@ public class SurveyInfoDao extends AbstractDao<SurveyInfo> {
         values.put("typeId", surveyInfo.getTypeId());
         values.put("typeName", surveyInfo.getTypeName());
         values.put("companyName", surveyInfo.getCompanyName());
-        values.put("userId", userId);
         return values;
     }
 }

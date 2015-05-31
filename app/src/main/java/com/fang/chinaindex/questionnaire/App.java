@@ -6,16 +6,18 @@ import android.content.Context;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.fang.chinaindex.questionnaire.db.DBOpenHelper;
-import com.fang.chinaindex.questionnaire.db.DaoSession;
 import com.fang.chinaindex.questionnaire.db.DaoMaster;
+import com.fang.chinaindex.questionnaire.db.DaoSession;
+import com.fang.chinaindex.questionnaire.repository.CacheRepository;
 import com.fang.chinaindex.questionnaire.repository.Repository;
+import com.fang.chinaindex.questionnaire.repository.impl.CacheRepositoryImpl;
 import com.fang.chinaindex.questionnaire.repository.impl.RepositoryImpl;
 
 /**
  * Created by aspsine on 15-5-9.
  */
 public class App extends Application {
-    private static DaoSession daoSession;
+    private static CacheRepository cacheRepository;
     private static RequestQueue sRequestQueue;
     private static Repository sRepository;
     private static Context sContext;
@@ -31,11 +33,12 @@ public class App extends Application {
     private void initDataBase(){
         DBOpenHelper dbOpenHelper = new DBOpenHelper(getApplicationContext());
         DaoMaster daoMaster = new DaoMaster(dbOpenHelper.getWritableDatabase());
-        daoSession = daoMaster.newSession();
+        DaoSession daoSession = daoMaster.newSession();
+        cacheRepository = new CacheRepositoryImpl(daoSession);
     }
 
-    public static DaoSession getDaoSession(){
-        return daoSession;
+    public static CacheRepository getCacheRepository(){
+        return cacheRepository;
     }
 
     /**
@@ -45,7 +48,7 @@ public class App extends Application {
      */
     public static final Repository getRepository() {
         if (sRepository == null) {
-            sRepository = new RepositoryImpl(sContext);
+            sRepository = new RepositoryImpl();
         }
         return sRepository;
     }

@@ -63,7 +63,12 @@ public class NetRepositoryImpl implements NetRepository {
 
             @Override
             public void onResponse(String json) {
-                callback.success(mGson.fromJson(json, Login.class));
+                Login login = mGson.fromJson(json, Login.class);
+                if (TextUtils.isEmpty(login.getErrorMessage())) {
+                    callback.success(login);
+                } else {
+                    callback.failure(new Exception(login.getErrorMessage()));
+                }
             }
 
         }, new Response.ErrorListener() {

@@ -18,11 +18,11 @@ public class Question {
      */
     @SerializedName("QNum")
     private String qNum;
-    /**
-     *问题所在题库中的Id（暂时无用）
-     */
-    @SerializedName("iQuestionID")
-    private String questionId;
+//    /**
+//     *问题所在题库中的Id（暂时无用）
+//     */
+//    @SerializedName("iQuestionID")
+//    private String questionId;
     /**
      * 问题所在题库中的编号
      */
@@ -110,13 +110,13 @@ public class Question {
         this.qNum = qNum;
     }
 
-    public String getQuestionId() {
-        return questionId;
-    }
-
-    public void setQuestionId(String questionId) {
-        this.questionId = questionId;
-    }
+//    public String getQuestionId() {
+//        return questionId;
+//    }
+//
+//    public void setQuestionId(String questionId) {
+//        this.questionId = questionId;
+//    }
 
     public String getShowId() {
         return showId;

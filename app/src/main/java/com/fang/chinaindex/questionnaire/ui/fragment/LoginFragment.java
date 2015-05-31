@@ -135,7 +135,7 @@ public class LoginFragment extends BaseFragment implements View.OnClickListener 
     private void saveUserInfo(Login login) {
         UserInfo userInfo = login.getUserInfo();
         SharedPrefUtils.saveUserInfo(getActivity(), userInfo);
-        App.getDaoSession().getUserDao().save(userInfo);
+        App.getDaoSession().saveUserInfo(userInfo);
     }
 
     /**
@@ -173,7 +173,7 @@ public class LoginFragment extends BaseFragment implements View.OnClickListener 
                 if (activity == null || activity.isFinishing()) {
                     return;
                 }
-                Toast.makeText(activity, getString(R.string.login_error_exception), Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

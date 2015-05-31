@@ -74,14 +74,11 @@ public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayo
     }
 
     private void refresh() {
-        show("Caching...");
         App.getRepository().getSurveyResults(SharedPrefUtils.getUserId(getActivity()), new Repository.Callback<List<SurveyInfo>>() {
             @Override
             public void success(List<SurveyInfo> surveyInfos) {
                 swipeRefreshLayout.setRefreshing(false);
                 mAdapter.setData(surveyInfos);
-//                UserSurveyInfoDao.getInstance().save();
-//                SurveyInfoDao.getInstance().save(surveyInfos, SharedPrefUtils.getUserId(getActivity()));
                 getSurveys(surveyInfos);
             }
 
@@ -95,6 +92,7 @@ public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayo
     }
 
     private void getSurveys(List<SurveyInfo> surveyInfos) {
+        show("Caching...");
         String[] surveyIds = new String[surveyInfos.size()];
         for (int i = 0; i < surveyInfos.size(); i++) {
             surveyIds[i] = String.valueOf(surveyInfos.get(i).getSurveyId());
@@ -102,7 +100,6 @@ public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayo
         App.getRepository().getSurveyDetails(SharedPrefUtils.getUserId(getActivity()), surveyIds, new Repository.Callback<List<Survey>>() {
             @Override
             public void success(List<Survey> surveys) {
-
                 dismiss();
             }
 
