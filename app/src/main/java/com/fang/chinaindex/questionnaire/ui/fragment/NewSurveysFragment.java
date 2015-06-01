@@ -16,6 +16,7 @@ import com.fang.chinaindex.questionnaire.model.Survey;
 import com.fang.chinaindex.questionnaire.model.SurveyInfo;
 import com.fang.chinaindex.questionnaire.repository.Repository;
 import com.fang.chinaindex.questionnaire.ui.adapter.NewSurveysAdapter;
+import com.fang.chinaindex.questionnaire.util.L;
 import com.fang.chinaindex.questionnaire.util.SharedPrefUtils;
 
 import java.util.List;
@@ -24,6 +25,7 @@ import java.util.List;
  * A simple {@link Fragment} subclass.
  */
 public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener {
+    private static final String TAG = NewSurveysFragment.class.getSimpleName();
     private SwipeRefreshLayout swipeRefreshLayout;
     private NewSurveysAdapter mAdapter;
 
@@ -79,6 +81,7 @@ public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayo
             public void success(List<SurveyInfo> surveyInfos) {
                 swipeRefreshLayout.setRefreshing(false);
                 mAdapter.setData(surveyInfos);
+                App.getCacheRepository().saveSurveyInfos(SharedPrefUtils.getUserId(getActivity()), surveyInfos);
                 getSurveys(surveyInfos);
             }
 
@@ -100,6 +103,9 @@ public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayo
         App.getRepository().getSurveyDetails(SharedPrefUtils.getUserId(getActivity()), surveyIds, new Repository.Callback<List<Survey>>() {
             @Override
             public void success(List<Survey> surveys) {
+                long start = System.currentTimeMillis();
+                App.getCacheRepository().saveSurveys(surveys);
+                L.i(TAG, "time = " + (System.currentTimeMillis()-start));
                 dismiss();
             }
 

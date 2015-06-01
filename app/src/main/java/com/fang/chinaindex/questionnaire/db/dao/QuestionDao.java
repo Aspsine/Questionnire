@@ -16,20 +16,19 @@ public class QuestionDao extends AbstractDao<Question> {
 
     private static final String TABLE_NAME = "Question";
 
-    private static final String PARAMS = "_id integer autoincrement, " +
-            "questionId long primary key, " +
-            "surveyId long " +
+    private static final String PARAMS = "questionId long, " +
             "qNum text, " +
             "showId text, " +
-            "questionTitle text " +
-            "isMust text " +
-            "sort text " +
-            "score text " +
-            "category text " +
-            "categoryText text " +
-            "templateId text " +
-            "answerNumber text " +
-            "description text ";
+            "questionTitle text, " +
+            "isMust text, " +
+            "sort text, " +
+            "score text, " +
+            "category text, " +
+            "categoryText text, " +
+            "templateId text, " +
+            "answerNumber text, " +
+            "description text, " +
+            "FOREIGN KEY(surveyId) REFERENCES SurveyInfo(surveyId)";
 
     public static final void createTable(SQLiteDatabase db) {
         db.execSQL(SQLUtils.createTable(TABLE_NAME, PARAMS));

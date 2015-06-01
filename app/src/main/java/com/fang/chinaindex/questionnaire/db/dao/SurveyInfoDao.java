@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.fang.chinaindex.questionnaire.db.AbstractDao;
+import com.fang.chinaindex.questionnaire.model.Survey;
 import com.fang.chinaindex.questionnaire.model.SurveyInfo;
 import com.fang.chinaindex.questionnaire.util.SQLUtils;
 
@@ -18,10 +19,10 @@ public class SurveyInfoDao extends AbstractDao<SurveyInfo> {
 
     private static final String TABLE_NAME = "SurveyInfo";
 
-    private static final String PARAMS = "_id integer autoincrement, surveyId long primary key, title text, updateTime text, collectionEndTime text, typeId text, typeName text, companyName text";
+    private static final String PARAMS = "surveyId long primary key, title text, updateTime text, collectionEndTime text, typeId text, typeName text, companyName text";
 
     public static final void createTable(SQLiteDatabase db) {
-        db.execSQL(SQLUtils.createTable(TABLE_NAME, PARAMS));
+        db.execSQL(SQLUtils.createTable1(TABLE_NAME, PARAMS));
     }
 
     public static final void dropTable(SQLiteDatabase db) {
@@ -74,7 +75,29 @@ public class SurveyInfoDao extends AbstractDao<SurveyInfo> {
 //        db.update(TABLE_NAME, getContentValues(surveyInfo, null, false), "userId=?", new String[]{userId});
 //    }
 
-    public List<SurveyInfo> getSurveyInfos(String userId){
+    public List<SurveyInfo> getSurveyInfos(List<String> surveyIds) {
+        List<SurveyInfo> surveyInfos = new ArrayList<SurveyInfo>();
+        StringBuilder sb = new StringBuilder();
+        for (String id : surveyIds) {
+            sb.append(id).append(",");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        Cursor cursor = db.rawQuery("Select * from " + TABLE_NAME + " where userId in (" + sb.toString() + ")", null);
+        while (cursor.moveToNext()) {
+            SurveyInfo surveyInfo = new SurveyInfo();
+            surveyInfo.setSurveyId(cursor.getString(cursor.getColumnIndex("surveyId")));
+            surveyInfo.setTitle(cursor.getString(cursor.getColumnIndex("title")));
+            surveyInfo.setUpdateTime(cursor.getString(cursor.getColumnIndex("updateTime")));
+            surveyInfo.setCollectionEndTime(cursor.getString(cursor.getColumnIndex("collectionEndTime")));
+            surveyInfo.setTypeId(cursor.getString(cursor.getColumnIndex("typeId")));
+            surveyInfo.setTypeName(cursor.getString(cursor.getColumnIndex("typeName")));
+            surveyInfo.setCompanyName(cursor.getString(cursor.getColumnIndex("companyName")));
+            surveyInfos.add(surveyInfo);
+        }
+        return surveyInfos;
+    }
+
+    public List<SurveyInfo> getSurveyInfos(String userId) {
         List<SurveyInfo> surveyInfos = new ArrayList<SurveyInfo>();
         db.beginTransaction();
         try {

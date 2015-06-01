@@ -9,6 +9,17 @@ public class SQLUtils {
         sb.append("create table ")
                 .append(tableName)
                 .append("(")
+                .append("_id integer primary key autoincrement, ")
+                .append(params)
+                .append(")");
+        return sb.toString();
+    }
+
+    public static final String createTable1(String tableName, String params){
+        StringBuilder sb = new StringBuilder();
+        sb.append("create table ")
+                .append(tableName)
+                .append("(")
                 .append(params)
                 .append(")");
         return sb.toString();

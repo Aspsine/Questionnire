@@ -16,12 +16,12 @@ public class OptionDao extends AbstractDao<Option> {
 
     private static final String TABLE_NAME = "Option";
 
-    private static final String PARAMS = "_id integer autoincrement, " +
+    private static final String PARAMS =
             "optionId long, " +
-            "surveyId, long, " +
+            "surveyId long, " +
             "questionId long, " +
             "optionTitle text, " +
-            "sort text " +
+            "sort text, " +
             "isOther text";
 
     public static final void createTable(SQLiteDatabase db) {

@@ -1,5 +1,6 @@
 package com.fang.chinaindex.questionnaire.repository.impl;
 
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.fang.chinaindex.questionnaire.db.DaoSession;
@@ -16,6 +17,7 @@ import com.fang.chinaindex.questionnaire.model.SurveyInfo;
 import com.fang.chinaindex.questionnaire.model.UserInfo;
 import com.fang.chinaindex.questionnaire.repository.CacheRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,11 +32,12 @@ public class CacheRepositoryImpl implements CacheRepository {
         this.db = daoSession.getSQLiteDatabase();
     }
 
-
+    @Override
     public void saveUserInfo(UserInfo userInfo) {
         daoSession.getUserDao().replace(userInfo);
     }
 
+    @Override
     public void saveSurveyInfos(String userId, List<SurveyInfo> surveyInfos) {
         UserSurveyInfoDao userSurveyInfoDao = daoSession.getUserSurveyInfoDao();
         SurveyInfoDao surveyInfoDao = daoSession.getSurveyInfoDao();
@@ -48,6 +51,23 @@ public class CacheRepositoryImpl implements CacheRepository {
         }
     }
 
+    @Override
+    public List<SurveyInfo> getSurveyInfos(String userId) {
+        UserSurveyInfoDao userSurveyInfoDao = daoSession.getUserSurveyInfoDao();
+        SurveyInfoDao surveyInfoDao = daoSession.getSurveyInfoDao();
+        List<SurveyInfo> surveyInfos = null;
+        db.beginTransaction();
+        try {
+            List<String> surveyIds = userSurveyInfoDao.getSurveyIdsByUserId(userId);
+            surveyInfos = surveyInfoDao.getSurveyInfos(surveyIds);
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+        return surveyInfos;
+    }
+
+    @Override
     public void saveSurveys(List<Survey> surveys) {
         QuestionDao questionDao = daoSession.getQuestionDao();
         OptionDao optionDao = daoSession.getOptionDao();
@@ -69,7 +89,7 @@ public class CacheRepositoryImpl implements CacheRepository {
                     //保存logics 通过surveyId，和questionId关联
                     List<Logic> logics = question.getLogics();
                     if (logics != null && logics.size() > 0) {
-                        logicDao.replace(info.getSurveyId(), question.getId(), logics);
+                        logicDao.replace(info.getSurveyId(), logics);
                     }
                 }
             }
@@ -77,6 +97,25 @@ public class CacheRepositoryImpl implements CacheRepository {
         } finally {
             db.endTransaction();
         }
+    }
+
+    @Override
+    public Survey getSurvey(String surveyId) {
+
+        return null;
+    }
+
+    @Override
+    public List<Survey> getSurveys(String userId) {
+        List<Survey> surveys = new ArrayList<Survey>();
+        db.beginTransaction();
+        try {
+            Cursor cursor = db.rawQuery("Select * from Survey", null);
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+        return null;
     }
 
 

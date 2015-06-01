@@ -18,7 +18,7 @@ public class UserSurveyInfoDao extends AbstractDao<UserSurveyInfoDao> {
 
     private static final String TABLE_NAME = "User_SurveyInfo";
 
-    private static final String PARAMS = "_id integer primary key autoincrement, userId long, surveyId long";
+    private static final String PARAMS = "userId long, surveyId long";
 
     public static final void createTable(SQLiteDatabase db) {
         db.execSQL(SQLUtils.createTable(TABLE_NAME, PARAMS));

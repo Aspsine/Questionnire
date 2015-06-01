@@ -135,7 +135,7 @@ public class LoginFragment extends BaseFragment implements View.OnClickListener 
     private void saveUserInfo(Login login) {
         UserInfo userInfo = login.getUserInfo();
         SharedPrefUtils.saveUserInfo(getActivity(), userInfo);
-        App.getDaoSession().saveUserInfo(userInfo);
+        App.getCacheRepository().saveUserInfo(userInfo);
     }
 
     /**

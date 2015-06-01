@@ -12,9 +12,14 @@ import com.fang.chinaindex.questionnaire.util.SQLUtils;
  */
 public class UserDao extends AbstractDao<UserInfo> {
 
-    private static final String TABLE_NAME = "USER";
+    private static final String TABLE_NAME = "User";
 
-    private static final String PARAMS = "_id integer autoincrement, userId long primary key, userName text, permissionEndTime text, realName text, email text";
+    private static final String PARAMS =
+            "userId long, " +
+            "userName text, " +
+            "permissionEndTime text, " +
+            "realName text, " +
+            "email text";
 
     public static final void createTable(SQLiteDatabase db) {
         db.execSQL(SQLUtils.createTable(TABLE_NAME, PARAMS));
