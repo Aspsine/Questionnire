@@ -16,7 +16,9 @@ public class QuestionDao extends AbstractDao<Question> {
 
     private static final String TABLE_NAME = "Question";
 
-    private static final String PARAMS = "questionId long, " +
+    private static final String PARAMS =
+            "questionId long, " +
+            "surveyId long, " +
             "qNum text, " +
             "showId text, " +
             "questionTitle text, " +
@@ -27,8 +29,7 @@ public class QuestionDao extends AbstractDao<Question> {
             "categoryText text, " +
             "templateId text, " +
             "answerNumber text, " +
-            "description text, " +
-            "FOREIGN KEY(surveyId) REFERENCES SurveyInfo(surveyId)";
+            "description text";
 
     public static final void createTable(SQLiteDatabase db) {
         db.execSQL(SQLUtils.createTable(TABLE_NAME, PARAMS));
