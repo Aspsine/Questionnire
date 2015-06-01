@@ -22,7 +22,7 @@ public class SurveyInfoDao extends AbstractDao<SurveyInfo> {
     private static final String PARAMS = "surveyId long primary key, title text, updateTime text, collectionEndTime text, typeId text, typeName text, companyName text";
 
     public static final void createTable(SQLiteDatabase db) {
-        db.execSQL(SQLUtils.createTable1(TABLE_NAME, PARAMS));
+        db.execSQL(SQLUtils.createTable(TABLE_NAME, PARAMS));
     }
 
     public static final void dropTable(SQLiteDatabase db) {
