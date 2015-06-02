@@ -64,14 +64,15 @@ public class UserSurveyInfoDao extends AbstractDao<UserSurveyInfoDao> {
     public List<String> getSurveyIdsByUserId(String userId) {
         List<String> surveyIds = new ArrayList<String>();
         db.beginTransaction();
+        Cursor cursor = db.rawQuery("Select surveyId from " + TABLE_NAME + " where userId=?", new String[]{userId});
         try {
-            Cursor cursor = db.rawQuery("Select surveyId from " + TABLE_NAME + " where userId=?", new String[]{userId});
             while (cursor.moveToNext()) {
                 String surveyId = cursor.getString(cursor.getColumnIndex("surveyId"));
                 surveyIds.add(surveyId);
             }
             db.setTransactionSuccessful();
         } finally {
+            cursor.close();
             db.endTransaction();
         }
         return surveyIds;

@@ -67,8 +67,8 @@ public class LoginFragment extends BaseFragment implements View.OnClickListener 
         btnLogin = (Button) view.findViewById(R.id.btnLogin);
         btnLogin.setOnClickListener(this);
         //TODO delete
-        etUserName.setText("adminF2");
-        etPassWord.setText("admin123");
+        etUserName.setText("yejianfeng");
+        etPassWord.setText("1472580");
     }
 
     @Override

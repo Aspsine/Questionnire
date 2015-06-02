@@ -19,7 +19,13 @@ public class SurveyInfoDao extends AbstractDao<SurveyInfo> {
 
     private static final String TABLE_NAME = "SurveyInfo";
 
-    private static final String PARAMS = "surveyId long primary key, title text, updateTime text, collectionEndTime text, typeId text, typeName text, companyName text";
+    private static final String PARAMS = "surveyId long, " +
+            "title text, " +
+            "updateTime text, " +
+            "collectionEndTime text, " +
+            "typeId text, " +
+            "typeName text, " +
+            "companyName text";
 
     public static final void createTable(SQLiteDatabase db) {
         db.execSQL(SQLUtils.createTable(TABLE_NAME, PARAMS));
@@ -33,13 +39,28 @@ public class SurveyInfoDao extends AbstractDao<SurveyInfo> {
         super(db);
     }
 
-    public void replace(List<SurveyInfo> surveyInfos) {
+    public void save(List<SurveyInfo> surveyInfos) {
+        updateIfFailsInsert(surveyInfos);
+    }
+
+    public void updateIfFailsInsert(List<SurveyInfo> surveyInfos) {
+        ContentValues contentValues = new ContentValues();
         for (SurveyInfo surveyInfo : surveyInfos) {
-            ContentValues contentValues = new ContentValues();
-            db.replace(TABLE_NAME, null, getContentValues(surveyInfo, contentValues, true));
+            ContentValues values = getContentValues(surveyInfo, contentValues, true);
+            if (db.update(TABLE_NAME, values, "surveyId = ?", new String[]{surveyInfo.getSurveyId()}) == 0) {
+                db.insert(TABLE_NAME, null, getContentValues(surveyInfo, contentValues, true));
+            }
             contentValues.clear();
         }
     }
+
+//    public void replace(List<SurveyInfo> surveyInfos) {
+//        for (SurveyInfo surveyInfo : surveyInfos) {
+//            ContentValues contentValues = new ContentValues();
+//            db.replace(TABLE_NAME, null, getContentValues(surveyInfo, contentValues, true));
+//            contentValues.clear();
+//        }
+//    }
 //
 //    public void insert(List<SurveyInfo> surveyInfos) {
 //        db.beginTransaction();
@@ -75,6 +96,13 @@ public class SurveyInfoDao extends AbstractDao<SurveyInfo> {
 //        db.update(TABLE_NAME, getContentValues(surveyInfo, null, false), "userId=?", new String[]{userId});
 //    }
 
+    public SurveyInfo getSurveyInfo(String surveyId) {
+        List<String> surveyIds = new ArrayList<>();
+        surveyIds.add(surveyId);
+        List<SurveyInfo> surveyInfos = getSurveyInfos(surveyIds);
+        return surveyInfos.size() > 0 ? surveyInfos.get(0) : null;
+    }
+
     public List<SurveyInfo> getSurveyInfos(List<String> surveyIds) {
         List<SurveyInfo> surveyInfos = new ArrayList<SurveyInfo>();
         StringBuilder sb = new StringBuilder();
@@ -82,7 +110,7 @@ public class SurveyInfoDao extends AbstractDao<SurveyInfo> {
             sb.append(id).append(",");
         }
         sb.deleteCharAt(sb.length() - 1);
-        Cursor cursor = db.rawQuery("Select * from " + TABLE_NAME + " where userId in (" + sb.toString() + ")", null);
+        Cursor cursor = db.rawQuery("Select * from " + TABLE_NAME + " where surveyId in (?)", new String[]{sb.toString()});
         while (cursor.moveToNext()) {
             SurveyInfo surveyInfo = new SurveyInfo();
             surveyInfo.setSurveyId(cursor.getString(cursor.getColumnIndex("surveyId")));

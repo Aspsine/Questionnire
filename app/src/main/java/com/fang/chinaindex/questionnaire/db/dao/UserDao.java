@@ -14,8 +14,7 @@ public class UserDao extends AbstractDao<UserInfo> {
 
     private static final String TABLE_NAME = "User";
 
-    private static final String PARAMS =
-            "userId long, " +
+    private static final String PARAMS = "userId long, " +
             "userName text, " +
             "permissionEndTime text, " +
             "realName text, " +
@@ -33,16 +32,31 @@ public class UserDao extends AbstractDao<UserInfo> {
         super(db);
     }
 
-    public void replace(UserInfo userInfo) {
+    public void save(UserInfo userInfo) {
+        updateIfFailsInsert(userInfo);
+    }
+
+    public void updateIfFailsInsert(UserInfo userInfo) {
         ContentValues values = new ContentValues();
         values.put("userId", userInfo.getUserId());
         values.put("userName", userInfo.getUserName());
         values.put("permissionEndTime", userInfo.getPermissionEndTime());
         values.put("realName", userInfo.getRealName());
         values.put("email", userInfo.getEmail());
-        db.replace(TABLE_NAME, null, values);
+        if (db.update(TABLE_NAME, values, "userId=?", new String[]{userInfo.getUserId()}) == 0) {
+            db.insert(TABLE_NAME, null, values);
+        }
     }
 
+//    public void replace(UserInfo userInfo) {
+//        ContentValues values = new ContentValues();
+//        values.put("userId", userInfo.getUserId());
+//        values.put("userName", userInfo.getUserName());
+//        values.put("permissionEndTime", userInfo.getPermissionEndTime());
+//        values.put("realName", userInfo.getRealName());
+//        values.put("email", userInfo.getEmail());
+//        db.replace(TABLE_NAME, null, values);
+//    }
 
 //    public synchronized void save(UserInfo userInfo) {
 //        if (exist(String.valueOf(userInfo.getUserId()))) {
@@ -52,15 +66,7 @@ public class UserDao extends AbstractDao<UserInfo> {
 //        }
 //    }
 //
-//    public synchronized void insert(UserInfo userInfo) {
-//        ContentValues values = new ContentValues();
-//        values.put("userId", userInfo.getUserId());
-//        values.put("userName", userInfo.getUserName());
-//        values.put("permissionEndTime", userInfo.getPermissionEndTime());
-//        values.put("realName", userInfo.getRealName());
-//        values.put("email", userInfo.getEmail());
-//        db.insert(TABLE_NAME, null, values);
-//    }
+
 //
 //    public synchronized void delete(String userId) {
 //        db.delete(TABLE_NAME, "userId = ?", new String[]{userId});

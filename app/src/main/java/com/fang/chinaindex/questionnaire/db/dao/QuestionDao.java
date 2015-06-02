@@ -1,12 +1,14 @@
 package com.fang.chinaindex.questionnaire.db.dao;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.fang.chinaindex.questionnaire.db.AbstractDao;
 import com.fang.chinaindex.questionnaire.model.Question;
 import com.fang.chinaindex.questionnaire.util.SQLUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,8 +18,7 @@ public class QuestionDao extends AbstractDao<Question> {
 
     private static final String TABLE_NAME = "Question";
 
-    private static final String PARAMS =
-            "questionId long, " +
+    private static final String PARAMS = "questionId long, " +
             "surveyId long, " +
             "qNum text, " +
             "showId text, " +
@@ -43,12 +44,57 @@ public class QuestionDao extends AbstractDao<Question> {
         super(db);
     }
 
-    public void replace(String surveyId, List<Question> questions) {
+    public void save(String surveyId, List<Question> questions) {
+        updateIfFailsInsert(surveyId, questions);
+    }
+
+    public void updateIfFailsInsert(String surveyId, List<Question> questions) {
         ContentValues contentValues = new ContentValues();
         for (Question question : questions) {
-            db.replace(TABLE_NAME, null, getContentValue(surveyId, question, contentValues, true));
+            ContentValues values = getContentValue(surveyId, question, contentValues, true);
+            if (db.update(TABLE_NAME, values, "questionId=? and surveyId=?", new String[]{question.getId(), surveyId}) == 0) {
+                db.insert(TABLE_NAME, null, values);
+            }
             contentValues.clear();
         }
+    }
+
+//    public void insert(String surveyId, List<Question> questions) {
+//        ContentValues contentValues = new ContentValues();
+//        for (Question question : questions) {
+//            db.insert(TABLE_NAME, null, getContentValue(surveyId, question, contentValues, true));
+//            contentValues.clear();
+//        }
+//    }
+//
+//    public void delete(String surveyId) {
+//        db.delete(TABLE_NAME, "surveyId = ?", new String[]{surveyId});
+//    }
+
+    public List<Question> getQuestions(String surveyId) {
+        List<Question> questions = new ArrayList<Question>();
+        Cursor cursor = db.rawQuery("select * from question where surveyId =?", new String[]{surveyId});
+        try {
+            while (cursor.moveToNext()) {
+                Question question = new Question();
+                question.setId(cursor.getString(cursor.getColumnIndex("questionId")));
+                question.setqNum(cursor.getString(cursor.getColumnIndex("qNum")));
+                question.setShowId(cursor.getString(cursor.getColumnIndex("showId")));
+                question.setQuestionTitle(cursor.getString(cursor.getColumnIndex("questionTitle")));
+                question.setIsMust(cursor.getString(cursor.getColumnIndex("isMust")));
+                question.setSort(cursor.getString(cursor.getColumnIndex("sort")));
+                question.setScore(cursor.getString(cursor.getColumnIndex("score")));
+                question.setCategory(cursor.getString(cursor.getColumnIndex("category")));
+                question.setCategoryText(cursor.getString(cursor.getColumnIndex("categoryText")));
+                question.setTemplateId(cursor.getString(cursor.getColumnIndex("templateId")));
+                question.setAnswerNumber(cursor.getString(cursor.getColumnIndex("answerNumber")));
+                question.setDescription(cursor.getString(cursor.getColumnIndex("description")));
+                questions.add(question);
+            }
+        } finally {
+            cursor.close();
+        }
+        return questions;
     }
 
     public ContentValues getContentValue(String surveyId, Question question, ContentValues contentValues, boolean useCache) {

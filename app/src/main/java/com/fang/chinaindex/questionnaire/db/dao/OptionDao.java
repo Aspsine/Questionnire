@@ -1,12 +1,14 @@
 package com.fang.chinaindex.questionnaire.db.dao;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.fang.chinaindex.questionnaire.db.AbstractDao;
 import com.fang.chinaindex.questionnaire.model.Option;
 import com.fang.chinaindex.questionnaire.util.SQLUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,8 +18,7 @@ public class OptionDao extends AbstractDao<Option> {
 
     private static final String TABLE_NAME = "Option";
 
-    private static final String PARAMS =
-            "optionId long, " +
+    private static final String PARAMS = "optionId long, " +
             "surveyId long, " +
             "questionId long, " +
             "optionTitle text, " +
@@ -36,12 +37,59 @@ public class OptionDao extends AbstractDao<Option> {
         super(db);
     }
 
-    public void replace(String surveyId, String questionId, List<Option> options) {
+    public void save(String surveyId, String questionId, List<Option> options) {
+        updateIfFailsInsert(surveyId, questionId, options);
+    }
+
+    public void updateIfFailsInsert(String surveyId, String questionId, List<Option> options) {
         ContentValues contentValues = new ContentValues();
         for (Option option : options) {
-            db.replace(TABLE_NAME, null, getContentValues(surveyId, questionId, option, contentValues, true));
+            ContentValues values = getContentValues(surveyId, questionId, option, contentValues, true);
+            if (db.update(TABLE_NAME, values,
+                    "surveyId = ? and questionId = ? and optionId = ?",
+                    new String[]{surveyId, questionId, option.getId()}) == 0) {
+                db.insert(TABLE_NAME, null, values);
+            }
             contentValues.clear();
         }
+    }
+
+//    public void insert(String surveyId, String questionId, List<Option> options) {
+//        ContentValues contentValues = new ContentValues();
+//        for (Option option : options) {
+//            db.insert(TABLE_NAME, null, getContentValues(surveyId, questionId, option, contentValues, true));
+//            contentValues.clear();
+//        }
+//    }
+//
+//    public void delete(String surveyId) {
+//        db.delete(TABLE_NAME, "surveyId = ?", new String[]{surveyId});
+//    }
+
+//    public void replace(String surveyId, String questionId, List<Option> options) {
+//        ContentValues contentValues = new ContentValues();
+//        for (Option option : options) {
+//            db.replace(TABLE_NAME, null, getContentValues(surveyId, questionId, option, contentValues, true));
+//            contentValues.clear();
+//        }
+//    }
+
+    public List<Option> getOptions(String questionId) {
+        List<Option> options = new ArrayList<Option>();
+        Cursor cursor = db.rawQuery("select * from Option where questionId = ?", new String[]{questionId});
+        try {
+            while (cursor.moveToNext()) {
+                Option option = new Option();
+                option.setId(cursor.getString(cursor.getColumnIndex("optionId")));
+                option.setOptionTitle(cursor.getString(cursor.getColumnIndex("optionTitle")));
+                option.setSort(cursor.getString(cursor.getColumnIndex("sort")));
+                option.setIsOther(Boolean.valueOf(cursor.getString(cursor.getColumnIndex("isOther"))));
+                options.add(option);
+            }
+        } finally {
+            cursor.close();
+        }
+        return options;
     }
 
     public ContentValues getContentValues(String surveyId, String questionId, Option option, ContentValues contentValues, boolean useCache) {
@@ -54,4 +102,6 @@ public class OptionDao extends AbstractDao<Option> {
         values.put("isOther", option.isOther());
         return values;
     }
+
+
 }

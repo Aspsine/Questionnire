@@ -98,7 +98,15 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
     }
 
     private void initTemplateSurvey() {
-        refresh();
+        mTemplateSurvey = App.getCacheRepository().getSurvey(mSurveyId);
+        mSurveyInfo = mTemplateSurvey.getInfo();
+        mTemplateQuestions = mTemplateSurvey.getQuestions();
+
+        setTitle(mSurveyInfo.getTitle());
+
+        initQuestion();
+
+//        refresh();
     }
 
     @Override

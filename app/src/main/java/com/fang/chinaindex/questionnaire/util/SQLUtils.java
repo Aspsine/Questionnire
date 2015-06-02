@@ -15,6 +15,16 @@ public class SQLUtils {
         return sb.toString();
     }
 
+    public static final String createTableWithoutAutoIncrementId(String tableName, String params){
+        StringBuilder sb = new StringBuilder();
+        sb.append("create table ")
+                .append(tableName)
+                .append("(")
+                .append(params)
+                .append(")");
+        return sb.toString();
+    }
+
     public static final String dropTable(String tableName){
         return "drop table if exists " + tableName;
     }

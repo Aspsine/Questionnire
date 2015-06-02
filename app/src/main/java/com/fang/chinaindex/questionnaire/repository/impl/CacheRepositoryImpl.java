@@ -1,6 +1,5 @@
 package com.fang.chinaindex.questionnaire.repository.impl;
 
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.fang.chinaindex.questionnaire.db.DaoSession;
@@ -34,7 +33,7 @@ public class CacheRepositoryImpl implements CacheRepository {
 
     @Override
     public void saveUserInfo(UserInfo userInfo) {
-        daoSession.getUserDao().replace(userInfo);
+        daoSession.getUserDao().save(userInfo);
     }
 
     @Override
@@ -43,7 +42,7 @@ public class CacheRepositoryImpl implements CacheRepository {
         SurveyInfoDao surveyInfoDao = daoSession.getSurveyInfoDao();
         db.beginTransaction();
         try {
-            surveyInfoDao.replace(surveyInfos);
+            surveyInfoDao.save(surveyInfos);
             userSurveyInfoDao.save(userId, surveyInfos);
             db.setTransactionSuccessful();
         } finally {
@@ -79,17 +78,17 @@ public class CacheRepositoryImpl implements CacheRepository {
                 SurveyInfo info = survey.getInfo();
                 //保存questions 通过surveyId关联
                 List<Question> questions = survey.getQuestions();
-                questionDao.replace(info.getSurveyId(), questions);
+                questionDao.save(info.getSurveyId(), questions);
                 for (Question question : questions) {
                     //保存options 通过surveyId，和questionId关联
                     List<Option> options = question.getOptions();
                     if (options != null && options.size() > 0) {
-                        optionDao.replace(info.getSurveyId(), question.getId(), options);
+                        optionDao.save(info.getSurveyId(), question.getId(), options);
                     }
                     //保存logics 通过surveyId，和questionId关联
                     List<Logic> logics = question.getLogics();
                     if (logics != null && logics.size() > 0) {
-                        logicDao.replace(info.getSurveyId(), logics);
+                        logicDao.save(info.getSurveyId(), logics);
                     }
                 }
             }
@@ -101,21 +100,60 @@ public class CacheRepositoryImpl implements CacheRepository {
 
     @Override
     public Survey getSurvey(String surveyId) {
-
-        return null;
-    }
-
-    @Override
-    public List<Survey> getSurveys(String userId) {
-        List<Survey> surveys = new ArrayList<Survey>();
+        SurveyInfoDao surveyInfoDao = daoSession.getSurveyInfoDao();
+        QuestionDao questionDao = daoSession.getQuestionDao();
+        OptionDao optionDao = daoSession.getOptionDao();
+        LogicDao logicDao = daoSession.getLogicDao();
+        Survey survey = new Survey();
         db.beginTransaction();
         try {
-            Cursor cursor = db.rawQuery("Select * from Survey", null);
+            SurveyInfo surveyInfo = surveyInfoDao.getSurveyInfo(surveyId);
+            survey.setInfo(surveyInfo);
+            List<Question> questions = questionDao.getQuestions(surveyId);
+            for (Question question : questions) {
+                List<Option> options = optionDao.getOptions(question.getId());
+                List<Logic> logics = logicDao.getLogics(question.getId());
+                question.setOptions(options);
+                question.setLogics(logics);
+            }
+            survey.setQuestions(questions);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
         }
-        return null;
+        return survey;
+    }
+
+    @Override
+    public List<Survey> getSurveys(String userId) {
+        UserSurveyInfoDao userSurveyInfoDao = daoSession.getUserSurveyInfoDao();
+        SurveyInfoDao surveyInfoDao = daoSession.getSurveyInfoDao();
+        QuestionDao questionDao = daoSession.getQuestionDao();
+        OptionDao optionDao = daoSession.getOptionDao();
+        LogicDao logicDao = daoSession.getLogicDao();
+        List<Survey> surveys = new ArrayList<Survey>();
+        List<SurveyInfo> surveyInfos = null;
+        db.beginTransaction();
+        try {
+            List<String> surveyIds = userSurveyInfoDao.getSurveyIdsByUserId(userId);
+            surveyInfos = surveyInfoDao.getSurveyInfos(surveyIds);
+            for (SurveyInfo surveyInfo : surveyInfos) {
+                Survey survey = new Survey();
+                survey.setInfo(surveyInfo);
+                List<Question> questions = questionDao.getQuestions(surveyInfo.getSurveyId());
+                for (Question question : questions) {
+                    List<Option> options = optionDao.getOptions(question.getId());
+                    List<Logic> logics = logicDao.getLogics(question.getId());
+                    question.setOptions(options);
+                    question.setLogics(logics);
+                }
+                survey.setQuestions(questions);
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+        return surveys;
     }
 
 
