@@ -41,9 +41,9 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
      * start time of the survey
      * <br/>
      * if (mStartTime.equals(START_TIME_NONE)){
-     *      回答新问卷
+     * 回答新问卷
      * }else{
-     *     继续回答旧问卷
+     * 继续回答旧问卷
      * }
      */
     private String mStartTime;
@@ -378,13 +378,15 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
 
     private Logic getJumpLogic(List<Logic> logics) {
         Logic logic = null;
+        List<Question> answeredQuestions = mTemplateQuestions.subList(0, mCurrentPosition + 1);
         for (Logic lgc : logics) {
-            for (int i = 0; i <= mCurrentPosition; i++) {
-                Question question = mTemplateQuestions.get(i);
-                for (Option option : question.getOptions()) {
-                    if (option.isChecked() && option.getId().equals(lgc.getSelectAnswer())) {
-                        logic = lgc;
-                        break;
+            for (Question aQuestion : answeredQuestions) {
+                if (lgc.getLogicQuestionId().equals(aQuestion.getId())) {
+                    for (Option option : aQuestion.getOptions()) {
+                        if (option.isChecked() && option.getId().equals(lgc.getSelectAnswer())) {
+                            logic = lgc;
+                            break;
+                        }
                     }
                 }
             }

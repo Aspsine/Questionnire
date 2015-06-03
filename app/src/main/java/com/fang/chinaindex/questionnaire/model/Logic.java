@@ -15,7 +15,7 @@ public class Logic {
      * 问卷问题id
      */
     @SerializedName("iQuestionID")
-    private String questionId;
+    private String logicQuestionId;
     /**
      * 回答的选项
      */
@@ -49,12 +49,12 @@ public class Logic {
         this.id = id;
     }
 
-    public String getQuestionId() {
-        return questionId;
+    public String getLogicQuestionId() {
+        return logicQuestionId;
     }
 
-    public void setQuestionId(String questionId) {
-        this.questionId = questionId;
+    public void setLogicQuestionId(String logicQuestionId) {
+        this.logicQuestionId = logicQuestionId;
     }
 
     public String getSelectAnswer() {

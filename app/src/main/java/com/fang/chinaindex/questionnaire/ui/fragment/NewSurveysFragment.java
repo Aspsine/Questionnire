@@ -19,6 +19,7 @@ import com.fang.chinaindex.questionnaire.ui.adapter.NewSurveysAdapter;
 import com.fang.chinaindex.questionnaire.util.L;
 import com.fang.chinaindex.questionnaire.util.SharedPrefUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -94,6 +95,7 @@ public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayo
         });
     }
 
+
     private void getSurveys(List<SurveyInfo> surveyInfos) {
         show("Caching...");
         String[] surveyIds = new String[surveyInfos.size()];
@@ -105,7 +107,7 @@ public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayo
             public void success(List<Survey> surveys) {
                 long start = System.currentTimeMillis();
                 App.getCacheRepository().saveSurveys(surveys);
-                L.i(TAG, "time = " + (System.currentTimeMillis()-start));
+                L.i(TAG, "time = " + (System.currentTimeMillis() - start));
                 dismiss();
             }
 

@@ -22,6 +22,7 @@ public class LogicDao extends AbstractDao<Logic> {
             "surveyId long, " +
             "questionId long, " +
             "selectAnswer text, " +
+            "logicQuestionId text, " +
             "skipFrom text, " +
             "skipTo text, " +
             "logicType text";
@@ -38,16 +39,16 @@ public class LogicDao extends AbstractDao<Logic> {
         super(db);
     }
 
-    public void save(String surveyId, List<Logic> logics) {
-        updateIfFailsInsert(surveyId, logics);
+    public void save(String surveyId, String questionId, List<Logic> logics) {
+        updateIfFailsInsert(surveyId, questionId, logics);
     }
 
-    public void updateIfFailsInsert(String surveyId, List<Logic> logics) {
+    public void updateIfFailsInsert(String surveyId, String questionId, List<Logic> logics) {
         ContentValues contentValues = new ContentValues();
         for (Logic logic : logics) {
-            ContentValues values = getContentValues(surveyId, logic, contentValues, true);
+            ContentValues values = getContentValues(surveyId, questionId, logic, contentValues, true);
             if (db.update(TABLE_NAME, values, "logicId = ? and surveyId = ? and questionId = ?",
-                    new String[]{logic.getId(), surveyId, logic.getQuestionId()}) == 0) {
+                    new String[]{logic.getId(), surveyId, questionId}) == 0) {
                 db.insert(TABLE_NAME, null, values);
             }
             contentValues.clear();
@@ -81,7 +82,7 @@ public class LogicDao extends AbstractDao<Logic> {
             while (cursor.moveToNext()) {
                 Logic logic = new Logic();
                 logic.setId(cursor.getString(cursor.getColumnIndex("logicId")));
-                logic.setQuestionId(cursor.getString(cursor.getColumnIndex("questionId")));
+                logic.setLogicQuestionId(cursor.getString(cursor.getColumnIndex("logicQuestionId")));
                 logic.setSelectAnswer(cursor.getString(cursor.getColumnIndex("selectAnswer")));
                 logic.setSkipFrom(cursor.getString(cursor.getColumnIndex("skipFrom")));
                 logic.setSkipTo(cursor.getString(cursor.getColumnIndex("skipTo")));
@@ -94,11 +95,12 @@ public class LogicDao extends AbstractDao<Logic> {
         return logics;
     }
 
-    public ContentValues getContentValues(String surveyId, Logic logic, ContentValues contentValues, boolean useCache) {
+    public ContentValues getContentValues(String surveyId, String questionId, Logic logic, ContentValues contentValues, boolean useCache) {
         ContentValues values = useCache ? contentValues : new ContentValues();
         values.put("surveyId", surveyId);
-        values.put("questionId", logic.getQuestionId());
+        values.put("questionId", questionId);
         values.put("logicId", logic.getId());
+        values.put("logicQuestionId", logic.getLogicQuestionId());
         values.put("selectAnswer", logic.getSelectAnswer());
         values.put("skipFrom", logic.getSkipFrom());
         values.put("skipTo", logic.getSkipTo());

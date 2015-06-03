@@ -88,7 +88,7 @@ public class CacheRepositoryImpl implements CacheRepository {
                     //保存logics 通过surveyId，和questionId关联
                     List<Logic> logics = question.getLogics();
                     if (logics != null && logics.size() > 0) {
-                        logicDao.save(info.getSurveyId(), logics);
+                        logicDao.save(info.getSurveyId(), question.getId(), logics);
                     }
                 }
             }
