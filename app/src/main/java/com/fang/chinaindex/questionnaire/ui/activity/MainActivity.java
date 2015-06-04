@@ -1,5 +1,6 @@
 package com.fang.chinaindex.questionnaire.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,6 +15,7 @@ import com.fang.chinaindex.questionnaire.ui.fragment.DrawerFragment;
 import com.fang.chinaindex.questionnaire.ui.fragment.NewSurveysFragment;
 import com.fang.chinaindex.questionnaire.ui.fragment.SubmitFragment;
 import com.fang.chinaindex.questionnaire.ui.fragment.UnFinishedFragment;
+import com.fang.chinaindex.questionnaire.util.SharedPrefUtils;
 
 
 public class MainActivity extends BaseActivity implements DrawerFragment.NavigationDrawerCallbacks{
@@ -132,6 +134,9 @@ public class MainActivity extends BaseActivity implements DrawerFragment.Navigat
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this, LoginActivity.class));
+            SharedPrefUtils.clearUserInfo(this);
+            finish();
             return true;
         }
 

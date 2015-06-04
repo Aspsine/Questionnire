@@ -54,4 +54,5 @@
     <string name="setting_fragment_exit_button">Exit</string>
     <string name="title_activity_splash">SplashActivity</string>
     <string name="title_activity_ques_manage">QuesManageActivity</string>
+    <string name="title_activity_settings">SettingsActivity</string>
 </resources>
