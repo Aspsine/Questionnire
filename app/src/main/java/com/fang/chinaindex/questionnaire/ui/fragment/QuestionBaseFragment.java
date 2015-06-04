@@ -50,6 +50,9 @@ public abstract class QuestionBaseFragment extends Fragment {
     private void setQuestionTitle(Question mQuestion) {
         StringBuilder sb = new StringBuilder();
         sb.append("<strong>")
+                .append("<font color=\"#F5B961\">")
+                .append(Boolean.valueOf(mQuestion.getIsMust())? "":"*")
+                .append("</font>")
                 .append("Q").append(mQuestion.getqNum()).append(".")
                 .append(mQuestion.getQuestionTitle())
                 .append("</strong>")

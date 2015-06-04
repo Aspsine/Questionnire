@@ -17,7 +17,9 @@ public interface CacheRepository {
 
     public List<SurveyInfo> getSurveyInfos(String userId);
 
-    public void saveSurveys(List<Survey> surveys);
+    public List<String> getSurveyIds(String userId);
+
+    public void saveSurveys(String userId, List<Survey> surveys);
 
     public Survey getSurvey(String surveyId);
 

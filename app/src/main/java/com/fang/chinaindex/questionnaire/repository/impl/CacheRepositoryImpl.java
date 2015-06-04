@@ -67,7 +67,23 @@ public class CacheRepositoryImpl implements CacheRepository {
     }
 
     @Override
-    public void saveSurveys(List<Survey> surveys) {
+    public List<String> getSurveyIds(String userId) {
+        UserSurveyInfoDao userSurveyInfoDao = daoSession.getUserSurveyInfoDao();
+        List<String> surveyIds = null;
+        db.beginTransaction();
+        try {
+            surveyIds = userSurveyInfoDao.getSurveyIdsByUserId(userId);
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+        return surveyIds;
+    }
+
+    @Override
+    public void saveSurveys(String userId, List<Survey> surveys) {
+        UserSurveyInfoDao userSurveyInfoDao = daoSession.getUserSurveyInfoDao();
+        SurveyInfoDao surveyInfoDao = daoSession.getSurveyInfoDao();
         QuestionDao questionDao = daoSession.getQuestionDao();
         OptionDao optionDao = daoSession.getOptionDao();
         LogicDao logicDao = daoSession.getLogicDao();
@@ -76,6 +92,10 @@ public class CacheRepositoryImpl implements CacheRepository {
         try {
             for (Survey survey : surveys) {
                 SurveyInfo info = survey.getInfo();
+                //关联表
+                userSurveyInfoDao.save(userId, info);
+                //保存surveyInfo
+                surveyInfoDao.save(info);
                 //保存questions 通过surveyId关联
                 List<Question> questions = survey.getQuestions();
                 questionDao.save(info.getSurveyId(), questions);

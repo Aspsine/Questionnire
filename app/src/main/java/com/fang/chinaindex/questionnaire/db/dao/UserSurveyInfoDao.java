@@ -32,12 +32,17 @@ public class UserSurveyInfoDao extends AbstractDao<UserSurveyInfoDao> {
         super(db);
     }
 
+    public void save(String userId, SurveyInfo surveyInfo) {
+        if (!exist(userId, surveyInfo.getSurveyId())) {
+            insert(userId, surveyInfo);
+        }
+    }
+
     public void save(String userId, List<SurveyInfo> surveyInfos) {
         if (existByUserId(userId)) {
             deleteByUserId(userId);
-        } else {
-            insert(userId, surveyInfos);
         }
+        insert(userId, surveyInfos);
     }
 
     public void insert(String userId, List<SurveyInfo> surveyInfos) {
@@ -46,6 +51,10 @@ public class UserSurveyInfoDao extends AbstractDao<UserSurveyInfoDao> {
             db.insert(TABLE_NAME, null, getContentValues(userId, surveyInfo.getSurveyId(), values, true));
             values.clear();
         }
+    }
+
+    public void insert(String userId, SurveyInfo surveyInfo) {
+        db.insert(TABLE_NAME, null, getContentValues(userId, surveyInfo.getSurveyId(), null, false));
     }
 
 
@@ -77,6 +86,17 @@ public class UserSurveyInfoDao extends AbstractDao<UserSurveyInfoDao> {
 
     private boolean existByUserId(String userId) {
         return getSurveyIdsByUserId(userId).size() > 0;
+    }
+
+    private boolean exist(String userId, String surveyId) {
+        Cursor cursor = db.rawQuery("Select surveyId from " + TABLE_NAME + " where userId=? and surveyId = ?", new String[]{userId, surveyId});
+        boolean exist;
+        try {
+            exist = cursor.moveToNext();
+        } finally {
+            cursor.close();
+        }
+        return exist;
     }
 
     private ContentValues getContentValues(String userId, String surveyId, ContentValues contentValues, boolean userCache) {

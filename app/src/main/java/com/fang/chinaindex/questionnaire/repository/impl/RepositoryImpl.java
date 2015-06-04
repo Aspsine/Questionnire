@@ -52,7 +52,7 @@ public class RepositoryImpl implements Repository {
     }
 
     @Override
-    public void getSurveyDetails(final String userId, final String[] surveyIds, final Callback<List<Survey>> callback) {
+    public void getSurveyDetails(final String userId, final List<String> surveyIds, final Callback<List<Survey>> callback) {
         mNet.getSurveyDetails(userId, surveyIds, new Callback<List<Survey>>() {
             @Override
             public void success(List<Survey> surveys) {

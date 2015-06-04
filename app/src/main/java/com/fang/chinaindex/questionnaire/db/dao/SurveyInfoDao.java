@@ -39,6 +39,10 @@ public class SurveyInfoDao extends AbstractDao<SurveyInfo> {
         super(db);
     }
 
+    public void save(SurveyInfo surveyInfo){
+        updateIfFailsInsert(surveyInfo);
+    }
+
     public void save(List<SurveyInfo> surveyInfos) {
         updateIfFailsInsert(surveyInfos);
     }
@@ -51,6 +55,13 @@ public class SurveyInfoDao extends AbstractDao<SurveyInfo> {
                 db.insert(TABLE_NAME, null, getContentValues(surveyInfo, contentValues, true));
             }
             contentValues.clear();
+        }
+    }
+
+    public void updateIfFailsInsert(SurveyInfo surveyInfo) {
+        ContentValues contentValues = getContentValues(surveyInfo, null, false);
+        if (db.update(TABLE_NAME, contentValues, "surveyId = ?", new String[]{surveyInfo.getSurveyId()}) == 0) {
+            db.insert(TABLE_NAME, null, getContentValues(surveyInfo, contentValues, true));
         }
     }
 
@@ -105,22 +116,29 @@ public class SurveyInfoDao extends AbstractDao<SurveyInfo> {
 
     public List<SurveyInfo> getSurveyInfos(List<String> surveyIds) {
         List<SurveyInfo> surveyInfos = new ArrayList<SurveyInfo>();
+        if (surveyIds.size() <= 0) {
+            return surveyInfos;
+        }
         StringBuilder sb = new StringBuilder();
         for (String id : surveyIds) {
             sb.append(id).append(",");
         }
         sb.deleteCharAt(sb.length() - 1);
-        Cursor cursor = db.rawQuery("Select * from " + TABLE_NAME + " where surveyId in (?)", new String[]{sb.toString()});
-        while (cursor.moveToNext()) {
-            SurveyInfo surveyInfo = new SurveyInfo();
-            surveyInfo.setSurveyId(cursor.getString(cursor.getColumnIndex("surveyId")));
-            surveyInfo.setTitle(cursor.getString(cursor.getColumnIndex("title")));
-            surveyInfo.setUpdateTime(cursor.getString(cursor.getColumnIndex("updateTime")));
-            surveyInfo.setCollectionEndTime(cursor.getString(cursor.getColumnIndex("collectionEndTime")));
-            surveyInfo.setTypeId(cursor.getString(cursor.getColumnIndex("typeId")));
-            surveyInfo.setTypeName(cursor.getString(cursor.getColumnIndex("typeName")));
-            surveyInfo.setCompanyName(cursor.getString(cursor.getColumnIndex("companyName")));
-            surveyInfos.add(surveyInfo);
+        Cursor cursor = db.rawQuery("Select * from " + TABLE_NAME + " where surveyId in (" + sb.toString() + ")", null);
+        try {
+            while (cursor.moveToNext()) {
+                SurveyInfo surveyInfo = new SurveyInfo();
+                surveyInfo.setSurveyId(cursor.getString(cursor.getColumnIndex("surveyId")));
+                surveyInfo.setTitle(cursor.getString(cursor.getColumnIndex("title")));
+                surveyInfo.setUpdateTime(cursor.getString(cursor.getColumnIndex("updateTime")));
+                surveyInfo.setCollectionEndTime(cursor.getString(cursor.getColumnIndex("collectionEndTime")));
+                surveyInfo.setTypeId(cursor.getString(cursor.getColumnIndex("typeId")));
+                surveyInfo.setTypeName(cursor.getString(cursor.getColumnIndex("typeName")));
+                surveyInfo.setCompanyName(cursor.getString(cursor.getColumnIndex("companyName")));
+                surveyInfos.add(surveyInfo);
+            }
+        } finally {
+            cursor.close();
         }
         return surveyInfos;
     }

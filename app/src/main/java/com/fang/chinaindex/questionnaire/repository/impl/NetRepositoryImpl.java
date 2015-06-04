@@ -119,7 +119,7 @@ public class NetRepositoryImpl implements NetRepository {
     }
 
     @Override
-    public void getSurveyDetails(String userId, String[] surveyIds, final Callback<List<Survey>> callback) {
+    public void getSurveyDetails(String userId, List<String> surveyIds, final Callback<List<Survey>> callback) {
         StringBuilder sb = new StringBuilder();
         for (String id : surveyIds) {
             sb.append(id).append(",");

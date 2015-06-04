@@ -82,12 +82,12 @@ public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayo
             public void success(List<SurveyInfo> surveyInfos) {
                 swipeRefreshLayout.setRefreshing(false);
                 mAdapter.setData(surveyInfos);
-                App.getCacheRepository().saveSurveyInfos(SharedPrefUtils.getUserId(getActivity()), surveyInfos);
                 getSurveys(surveyInfos);
             }
 
             @Override
             public void failure(Exception e) {
+                mAdapter.setData(App.getCacheRepository().getSurveyInfos(SharedPrefUtils.getUserId(getActivity())));
                 dismiss();
                 swipeRefreshLayout.setRefreshing(false);
                 e.printStackTrace();
@@ -98,15 +98,32 @@ public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayo
 
     private void getSurveys(List<SurveyInfo> surveyInfos) {
         show("Caching...");
-        String[] surveyIds = new String[surveyInfos.size()];
-        for (int i = 0; i < surveyInfos.size(); i++) {
-            surveyIds[i] = String.valueOf(surveyInfos.get(i).getSurveyId());
+
+        List<String> cachedInfoIds = App.getCacheRepository().getSurveyIds(SharedPrefUtils.getUserId(getActivity()));
+        List<String> newSurveyIds = new ArrayList<>();
+        for (SurveyInfo surveyInfo : surveyInfos) {
+            boolean has = false;
+            for (String cachedInfoId : cachedInfoIds) {
+                if (surveyInfo.getSurveyId().equals(cachedInfoId)) {
+                    has = true;
+                    break;
+                }
+            }
+            if (!has) {
+                newSurveyIds.add(surveyInfo.getSurveyId());
+            }
         }
-        App.getRepository().getSurveyDetails(SharedPrefUtils.getUserId(getActivity()), surveyIds, new Repository.Callback<List<Survey>>() {
+        L.i(TAG, "newSurveyIds.size() = " + newSurveyIds.size());
+        if (newSurveyIds.size() <= 0) {
+            dismiss();
+            return;
+        }
+
+        App.getRepository().getSurveyDetails(SharedPrefUtils.getUserId(getActivity()), newSurveyIds, new Repository.Callback<List<Survey>>() {
             @Override
             public void success(List<Survey> surveys) {
                 long start = System.currentTimeMillis();
-                App.getCacheRepository().saveSurveys(surveys);
+                App.getCacheRepository().saveSurveys(SharedPrefUtils.getUserId(getActivity()), surveys);
                 L.i(TAG, "time = " + (System.currentTimeMillis() - start));
                 dismiss();
             }

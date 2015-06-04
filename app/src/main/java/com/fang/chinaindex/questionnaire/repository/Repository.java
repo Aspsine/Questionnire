@@ -16,7 +16,7 @@ public interface Repository {
 
     public void getSurveyResults(String userId, Callback<List<SurveyInfo>> callback);
 
-    public void getSurveyDetails(String userId, String[] surveyIds, Callback<List<Survey>> callback);
+    public void getSurveyDetails(String userId, List<String> surveyIds, Callback<List<Survey>> callback);
 
     public void uploadSample(String userId, Survey survey, Callback<UploadSampleResult> callback);
 

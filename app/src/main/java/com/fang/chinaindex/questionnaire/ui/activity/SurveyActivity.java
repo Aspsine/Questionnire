@@ -105,8 +105,6 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         setTitle(mSurveyInfo.getTitle());
 
         initQuestion();
-
-//        refresh();
     }
 
     @Override
@@ -119,29 +117,6 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
                 showUpQuestion();
                 break;
         }
-    }
-
-    private void refresh() {
-        show();
-        App.getRepository().getSurveyDetails(SharedPrefUtils.getUserId(this), new String[]{mSurveyId}, new Repository.Callback<List<Survey>>() {
-            @Override
-            public void success(List<Survey> surveys) {
-                dismiss();
-                mTemplateSurvey = surveys.get(0);
-                mSurveyInfo = mTemplateSurvey.getInfo();
-                mTemplateQuestions = mTemplateSurvey.getQuestions();
-
-                setTitle(mSurveyInfo.getTitle());
-
-                initQuestion();
-            }
-
-            @Override
-            public void failure(Exception e) {
-                dismiss();
-                e.printStackTrace();
-            }
-        });
     }
 
     /**

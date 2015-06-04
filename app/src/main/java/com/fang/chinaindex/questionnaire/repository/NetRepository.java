@@ -18,7 +18,7 @@ public interface NetRepository extends Repository {
     void getSurveyResults(String userId, Callback<List<SurveyInfo>> callback);
 
     @Override
-    void getSurveyDetails(String userId, String[] surveyIds, Callback<List<Survey>> callback);
+    void getSurveyDetails(String userId, List<String> surveyIds, Callback<List<Survey>> callback);
 
     @Override
     void uploadSample(String userId, Survey survey, Callback<UploadSampleResult> callback);
