@@ -1,5 +1,6 @@
 package com.fang.chinaindex.questionnaire.repository;
 
+import com.fang.chinaindex.questionnaire.model.Question;
 import com.fang.chinaindex.questionnaire.model.Survey;
 import com.fang.chinaindex.questionnaire.model.SurveyInfo;
 import com.fang.chinaindex.questionnaire.model.UserInfo;
@@ -25,4 +26,5 @@ public interface CacheRepository {
 
     public List<Survey> getSurveys(String userId);
 
+    public List<Question> getAnsweredQuestions(String userId, String startTime, String surveyId);
 }

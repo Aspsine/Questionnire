@@ -1,8 +1,10 @@
 package com.fang.chinaindex.questionnaire.ui.activity;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -14,7 +16,6 @@ import com.fang.chinaindex.questionnaire.model.Option;
 import com.fang.chinaindex.questionnaire.model.Question;
 import com.fang.chinaindex.questionnaire.model.Survey;
 import com.fang.chinaindex.questionnaire.model.SurveyInfo;
-import com.fang.chinaindex.questionnaire.repository.Repository;
 import com.fang.chinaindex.questionnaire.ui.fragment.MultiChoiceFragment;
 import com.fang.chinaindex.questionnaire.ui.fragment.OpenFragment;
 import com.fang.chinaindex.questionnaire.ui.fragment.QuestionBaseFragment;
@@ -95,6 +96,8 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
 
     private void initAnsweredSurvey() {
         mAnsweredQuestionPositions = new ArrayList<Integer>();
+        List<Question> answeredQuestions = App.getCacheRepository().getAnsweredQuestions(SharedPrefUtils.getUserId(this), mStartTime, mSurveyId);
+
     }
 
     private void initTemplateSurvey() {
@@ -248,7 +251,6 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         if (mAnsweredQuestionPositions.contains(mCurrentPosition)) {
 
         }
-
 
         Logic logic = getJumpLogic(currentQuestion.getLogics());
         if (logic == null) {
@@ -405,7 +407,26 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
     }
 
     private void showUpLoadDialog() {
-        Toast.makeText(this, "it's time to upload!", Toast.LENGTH_SHORT).show();
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Great! You have finished all the questions!")
+                .setMessage("Would you like to upload the survey?")
+                .setPositiveButton("upload", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(SurveyActivity.this, "upload click", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(SurveyActivity.this, "cancel click", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
+                })
+                .create();
+        dialog.show();
     }
 
     /**

@@ -176,5 +176,11 @@ public class CacheRepositoryImpl implements CacheRepository {
         return surveys;
     }
 
+    @Override
+    public List<Question> getAnsweredQuestions(String userId, String startTime, String surveyId) {
+
+        return null;
+    }
+
 
 }
