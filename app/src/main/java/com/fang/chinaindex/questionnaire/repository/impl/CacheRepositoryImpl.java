@@ -3,6 +3,8 @@ package com.fang.chinaindex.questionnaire.repository.impl;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.fang.chinaindex.questionnaire.db.DaoSession;
+import com.fang.chinaindex.questionnaire.db.dao.AnsweredOptionDao;
+import com.fang.chinaindex.questionnaire.db.dao.AnsweredQuestionDao;
 import com.fang.chinaindex.questionnaire.db.dao.LogicDao;
 import com.fang.chinaindex.questionnaire.db.dao.OptionDao;
 import com.fang.chinaindex.questionnaire.db.dao.QuestionDao;
@@ -177,9 +179,30 @@ public class CacheRepositoryImpl implements CacheRepository {
     }
 
     @Override
-    public List<Question> getAnsweredQuestions(String userId, String startTime, String surveyId) {
+    public void saveAnsweredQuestion(String userId, String surveyId, String startTime, Question question) {
+        AnsweredQuestionDao answeredQuestionDao = daoSession.getAnsweredQuestionDao();
+        AnsweredOptionDao answeredOptionDao = daoSession.getAnsweredOptionDao();
+        db.beginTransaction();
+        try{
+            answeredQuestionDao.save(userId, surveyId, startTime, question);
+            answeredOptionDao.save(userId, surveyId, question.getId(), startTime,question.getOptions());
+        }finally {
 
-        return null;
+        }
+    }
+
+    @Override
+    public List<Question> getAnsweredQuestions(String userId, String surveyId, String startTime) {
+        AnsweredQuestionDao answeredQuestionDao = daoSession.getAnsweredQuestionDao();
+        List<Question> questions = null;
+        db.beginTransaction();
+        try {
+            questions = answeredQuestionDao.getAnsweredQuestions(userId, surveyId, startTime);
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+        return questions;
     }
 
 

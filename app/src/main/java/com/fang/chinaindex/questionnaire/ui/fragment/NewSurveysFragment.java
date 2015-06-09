@@ -2,6 +2,8 @@ package com.fang.chinaindex.questionnaire.ui.fragment;
 
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -30,6 +32,8 @@ public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayo
     private SwipeRefreshLayout swipeRefreshLayout;
     private NewSurveysAdapter mAdapter;
 
+    private String mUserId;
+
     public NewSurveysFragment() {
         // Required empty public constructor
     }
@@ -38,6 +42,7 @@ public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayo
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAdapter = new NewSurveysAdapter();
+        mUserId = SharedPrefUtils.getUserId(getActivity());
     }
 
     @Override
@@ -77,7 +82,7 @@ public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayo
     }
 
     private void refresh() {
-        App.getRepository().getSurveyResults(SharedPrefUtils.getUserId(getActivity()), new Repository.Callback<List<SurveyInfo>>() {
+        App.getRepository().getSurveyResults(mUserId, new Repository.Callback<List<SurveyInfo>>() {
             @Override
             public void success(List<SurveyInfo> surveyInfos) {
                 swipeRefreshLayout.setRefreshing(false);
@@ -87,7 +92,7 @@ public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayo
 
             @Override
             public void failure(Exception e) {
-                mAdapter.setData(App.getCacheRepository().getSurveyInfos(SharedPrefUtils.getUserId(getActivity())));
+                mAdapter.setData(App.getCacheRepository().getSurveyInfos(mUserId));
                 dismiss();
                 swipeRefreshLayout.setRefreshing(false);
                 e.printStackTrace();
@@ -99,7 +104,7 @@ public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayo
     private void getSurveys(List<SurveyInfo> surveyInfos) {
         show("Caching...");
 
-        List<String> cachedInfoIds = App.getCacheRepository().getSurveyIds(SharedPrefUtils.getUserId(getActivity()));
+        List<String> cachedInfoIds = App.getCacheRepository().getSurveyIds(mUserId);
         List<String> newSurveyIds = new ArrayList<>();
         for (SurveyInfo surveyInfo : surveyInfos) {
             boolean has = false;
@@ -121,11 +126,17 @@ public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayo
 
         App.getRepository().getSurveyDetails(SharedPrefUtils.getUserId(getActivity()), newSurveyIds, new Repository.Callback<List<Survey>>() {
             @Override
-            public void success(List<Survey> surveys) {
-                long start = System.currentTimeMillis();
-                App.getCacheRepository().saveSurveys(SharedPrefUtils.getUserId(getActivity()), surveys);
-                L.i(TAG, "time = " + (System.currentTimeMillis() - start));
-                dismiss();
+            public void success(final List<Survey> surveys) {
+
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        long start = System.currentTimeMillis();
+                        App.getCacheRepository().saveSurveys(mUserId, surveys);
+                        L.i(TAG, "time = " + (System.currentTimeMillis() - start));
+                        handler.obtainMessage(0).sendToTarget();
+                    }
+                }).start();
             }
 
             @Override
@@ -136,5 +147,19 @@ public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayo
         });
     }
 
+    private final Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg.what == 0) {
+                dismiss();
+            }
+        }
+    };
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        handler.removeCallbacksAndMessages(null);
+    }
 }

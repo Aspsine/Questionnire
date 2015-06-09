@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import com.fang.chinaindex.questionnaire.R;
 import com.fang.chinaindex.questionnaire.model.Section;
 import com.fang.chinaindex.questionnaire.ui.adapter.DrawerAdapter;
+import com.fang.chinaindex.questionnaire.util.L;
 import com.fang.chinaindex.questionnaire.util.SharedPrefUtils;
 
 import java.util.ArrayList;
@@ -133,7 +134,12 @@ public class DrawerFragment extends Fragment implements DrawerAdapter.OnItemClic
 
     @Override
     public void onItemClick(int position, Section section, View v) {
-        selectItem(position);
+        if (position == mCurrentSelectedPosition) {
+            L.i("position == mCurrentSelectedPosition");
+            closeDrawer();
+        } else {
+            selectItem(position);
+        }
     }
 
 
@@ -142,9 +148,7 @@ public class DrawerFragment extends Fragment implements DrawerAdapter.OnItemClic
         if (mAdapter != null) {
             mAdapter.setItemChecked(position, true);
         }
-        if (mDrawerLayout != null) {
-            mDrawerLayout.closeDrawer(mFragmentContainerView);
-        }
+        closeDrawer();
         if (mCallbacks != null) {
             mCallbacks.onNavigationDrawerItemSelected(position);
         }
@@ -229,6 +233,12 @@ public class DrawerFragment extends Fragment implements DrawerAdapter.OnItemClic
         });
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+    }
+
+    private void closeDrawer() {
+        if (mDrawerLayout != null) {
+            mDrawerLayout.closeDrawer(mFragmentContainerView);
+        }
     }
 
     public boolean isDrawerOpen() {

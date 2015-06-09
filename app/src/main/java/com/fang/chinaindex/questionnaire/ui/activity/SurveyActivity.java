@@ -37,6 +37,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
     private ProgressDialog pDialog;
     private Button btnUp, btnNext;
 
+    private String mUserId;
     private String mSurveyId;
     /**
      * start time of the survey
@@ -84,6 +85,8 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         mSurveyId = intent.getStringExtra("EXTRA_SURVEY_ID");
         mStartTime = intent.getStringExtra("EXTRA_SURVEY_START_TIME");
 
+        mUserId = SharedPrefUtils.getUserId(this);
+
         btnNext = (Button) findViewById(R.id.btnNext);
         btnUp = (Button) findViewById(R.id.btnUp);
 
@@ -96,8 +99,8 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
 
     private void initAnsweredSurvey() {
         mAnsweredQuestionPositions = new ArrayList<Integer>();
-        List<Question> answeredQuestions = App.getCacheRepository().getAnsweredQuestions(SharedPrefUtils.getUserId(this), mStartTime, mSurveyId);
-
+        List<Question> answeredQuestions = App.getCacheRepository().getAnsweredQuestions(mUserId, mSurveyId, mStartTime);
+//        mCurrentPosition = calculatePosition(answeredQuestions);
     }
 
     private void initTemplateSurvey() {

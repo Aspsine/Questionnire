@@ -2,6 +2,9 @@ package com.fang.chinaindex.questionnaire.db;
 
 import android.database.sqlite.SQLiteDatabase;
 
+import com.fang.chinaindex.questionnaire.db.dao.AnsweredOptionDao;
+import com.fang.chinaindex.questionnaire.db.dao.AnsweredQuestionDao;
+import com.fang.chinaindex.questionnaire.db.dao.AnsweredSurveyInfoDao;
 import com.fang.chinaindex.questionnaire.db.dao.LogicDao;
 import com.fang.chinaindex.questionnaire.db.dao.OptionDao;
 import com.fang.chinaindex.questionnaire.db.dao.QuestionDao;
@@ -27,6 +30,10 @@ public class DaoMaster {
         QuestionDao.createTable(db);
         OptionDao.createTable(db);
         LogicDao.createTable(db);
+
+        AnsweredSurveyInfoDao.createTable(db);
+        AnsweredQuestionDao.createTable(db);
+        AnsweredOptionDao.createTable(db);
     }
 
     public static void dropTable(SQLiteDatabase db) {

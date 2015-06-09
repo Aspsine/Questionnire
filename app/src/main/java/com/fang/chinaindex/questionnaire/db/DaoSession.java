@@ -2,6 +2,8 @@ package com.fang.chinaindex.questionnaire.db;
 
 import android.database.sqlite.SQLiteDatabase;
 
+import com.fang.chinaindex.questionnaire.db.dao.AnsweredOptionDao;
+import com.fang.chinaindex.questionnaire.db.dao.AnsweredQuestionDao;
 import com.fang.chinaindex.questionnaire.db.dao.LogicDao;
 import com.fang.chinaindex.questionnaire.db.dao.OptionDao;
 import com.fang.chinaindex.questionnaire.db.dao.QuestionDao;
@@ -27,6 +29,9 @@ public class DaoSession {
 
     private final LogicDao logicDao;
 
+    private final AnsweredQuestionDao answeredQuestionDao;
+    private AnsweredOptionDao answeredOptionDao;
+
     public DaoSession(SQLiteDatabase db) {
         this.db = db;
 
@@ -36,6 +41,9 @@ public class DaoSession {
         this.questionDao = new QuestionDao(db);
         this.optionDao = new OptionDao(db);
         this.logicDao = new LogicDao(db);
+
+        this.answeredQuestionDao = new AnsweredQuestionDao(db);
+        this.answeredOptionDao = new AnsweredOptionDao(db);
     }
 
     public SQLiteDatabase getSQLiteDatabase() {
@@ -64,5 +72,13 @@ public class DaoSession {
 
     public LogicDao getLogicDao() {
         return logicDao;
+    }
+
+    public AnsweredQuestionDao getAnsweredQuestionDao() {
+        return answeredQuestionDao;
+    }
+
+    public AnsweredOptionDao getAnsweredOptionDao() {
+        return answeredOptionDao;
     }
 }
