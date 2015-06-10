@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -21,10 +22,12 @@ import com.fang.chinaindex.questionnaire.ui.fragment.OpenFragment;
 import com.fang.chinaindex.questionnaire.ui.fragment.QuestionBaseFragment;
 import com.fang.chinaindex.questionnaire.ui.fragment.SingleChoiceFragment;
 import com.fang.chinaindex.questionnaire.ui.fragment.SortFragment;
+import com.fang.chinaindex.questionnaire.util.DateUtils;
 import com.fang.chinaindex.questionnaire.util.L;
 import com.fang.chinaindex.questionnaire.util.SharedPrefUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -84,6 +87,9 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         Intent intent = getIntent();
         mSurveyId = intent.getStringExtra("EXTRA_SURVEY_ID");
         mStartTime = intent.getStringExtra("EXTRA_SURVEY_START_TIME");
+        if (TextUtils.isEmpty(mStartTime)) {
+            mStartTime = DateUtils.getCurrentDate();
+        }
 
         mUserId = SharedPrefUtils.getUserId(this);
 
@@ -235,6 +241,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         if (isCurrentQuestionBeenAnswered) {
             //回答了
             handlerAnsweredQuestion(currentQuestion);
+//            App.getCacheRepository().saveAnsweredQuestion(mUserId, mSurveyId, mStartTime, currentQuestion);
         } else {
             //没回答
             handlerNotAnsweredQuestion(currentQuestion);
@@ -250,9 +257,10 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         //TODO 保存问题
         // 1. 判断内存中该问题是否有该问题，如果有，更新该问题，并更新数据库。
         // 2. 如果没有该问题，则将该问题加入内存列表，并插入数据库
-//        saveQuestion(currentQuestion);
-        if (mAnsweredQuestionPositions.contains(mCurrentPosition)) {
-
+        saveQuestion(currentQuestion);
+        if (!mAnsweredQuestionPositions.contains(mCurrentPosition)) {
+            mAnsweredQuestionPositions.add(mCurrentPosition);
+            Collections.sort(mAnsweredQuestionPositions);
         }
 
         Logic logic = getJumpLogic(currentQuestion.getLogics());

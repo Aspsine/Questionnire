@@ -186,8 +186,9 @@ public class CacheRepositoryImpl implements CacheRepository {
         try{
             answeredQuestionDao.save(userId, surveyId, startTime, question);
             answeredOptionDao.save(userId, surveyId, question.getId(), startTime,question.getOptions());
+            db.setTransactionSuccessful();
         }finally {
-
+            db.endTransaction();
         }
     }
 

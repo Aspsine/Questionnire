@@ -21,10 +21,12 @@ public class AnsweredOptionDao extends AbstractDao<Option> {
     private static final String PARAMS = "optionId long, " +
             "surveyId long, " +
             "questionId long, " +
+            "userId long, " +
             "startTime text, " +
             "checked boolean, " +
             "optionTitle text, " +
             "sort text, " +
+            "openAnswer text, " +
             "isOther text";
 
     public static final void createTable(SQLiteDatabase db) {
@@ -46,10 +48,10 @@ public class AnsweredOptionDao extends AbstractDao<Option> {
     private void updateIfFailsInsert(String userId, String surveyId, String questionId, String startTime, List<Option> options) {
         ContentValues contentValues = new ContentValues();
         for (Option option : options) {
-            ContentValues values = getContentValues(userId, surveyId, questionId, option, contentValues, true);
+            ContentValues values = getContentValues(userId, surveyId, questionId, startTime, option, contentValues, true);
             if (db.update(TABLE_NAME, values,
-                    "userId = ? and surveyId = ? and questionId = ? and optionId = ?",
-                    new String[]{userId, surveyId, questionId, option.getId()}) == 0) {
+                    "userId = ? and surveyId = ? and questionId = ? and optionId = ? and startTime =?",
+                    new String[]{userId, surveyId, questionId, option.getId(), startTime}) == 0) {
                 db.insert(TABLE_NAME, null, values);
             }
             contentValues.clear();
@@ -66,6 +68,7 @@ public class AnsweredOptionDao extends AbstractDao<Option> {
             option.setSort(cursor.getString(cursor.getColumnIndex("sort")));
             option.setIsOther(Boolean.valueOf(cursor.getString(cursor.getColumnIndex("isOther"))));
             option.setChecked(Boolean.valueOf(cursor.getString(cursor.getColumnIndex("checked"))));
+            option.setOpenAnswer(cursor.getString(cursor.getColumnIndex("openAnswer")));
             options.add(option);
         } finally {
             cursor.close();
@@ -73,16 +76,18 @@ public class AnsweredOptionDao extends AbstractDao<Option> {
         return options;
     }
 
-    public ContentValues getContentValues(String userId, String surveyId, String questionId, Option option, ContentValues contentValues, boolean useCache) {
+    public ContentValues getContentValues(String userId, String surveyId, String questionId, String startTime, Option option, ContentValues contentValues, boolean useCache) {
         ContentValues values = useCache ? contentValues : new ContentValues();
         values.put("userId", userId);
         values.put("surveyId", surveyId);
         values.put("questionId", questionId);
         values.put("optionId", option.getId());
+        values.put("startTime", startTime);
+        values.put("checked", option.isChecked());
         values.put("optionTitle", option.getOptionTitle());
         values.put("sort", option.getSort());
+        values.put("openAnswer", option.getOpenAnswer());
         values.put("isOther", option.isOther());
-        values.put("checked", option.isChecked());
         return values;
     }
 }
