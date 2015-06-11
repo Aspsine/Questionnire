@@ -29,4 +29,6 @@ public interface CacheRepository {
     public void saveAnsweredQuestion(String userId, String surveyId, String startTime, Question question);
 
     public List<Question> getAnsweredQuestions(String userId, String surveyId, String startTime);
+
+    public void deleteAnsweredQuestions(String userId, String surveyId, String startTime, List<String> questionIds);
 }

@@ -213,7 +213,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
             if (isCurrentQuestionBeenAnswered) {
                 //回答了
                 saveQuestion(latestQuestion, true, true);
-            }else {
+            } else {
                 saveQuestion(latestQuestion, true, false);
             }
         }
@@ -231,12 +231,20 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
             mCurrentPosition = mAnsweredQuestionPositions.get(lastPositionIndex);
             showQuestion(mTemplateQuestions.get(mCurrentPosition));
         }
+
+        //Log
+        StringBuilder sb = new StringBuilder();
+        for (Integer i : mAnsweredQuestionPositions) {
+            sb.append(i + ", ");
+        }
+        L.i("mAnsweredQuestionPositions = " + sb.toString());
     }
 
     /**
      * 下一题/提交
      */
     public void showNextQuestion() {
+
         Question currentQuestion = mTemplateQuestions.get(mCurrentPosition);
         L.i("SurveyActivity", "mCurrentPosition = " + mCurrentPosition);
         List<Option> selectedOptions = getQuestionSelectedOptions(currentQuestion);
@@ -266,7 +274,48 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         if (logic == null) {
             uploadSurveyOrGoToNextIndexQuestion();
         } else {
-            doLogicJump(currentQuestion, logic);
+            if (mLatestPosition > mCurrentPosition) {
+
+                AlertDialog dialog = new AlertDialog.Builder(this)
+                        .setTitle("Alert!")
+                        .setMessage("修改此题会影响整个问卷后续题目，确认修改？")
+                        .setPositiveButton("确定修改", new DialogInterface.OnClickListener() {
+
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // 返回修改了一道逻辑跳转题
+                                //清理这道逻辑跳转题后的所有题目
+                                //1.清理 内存中的 mAnsweredQuestionPositions的 currentPosition 之后的数据
+                                //2.清理 currentPosition之后的所有数据库中保存的AnsweredQuestion和对应的AnsweredOption
+                                //3.mLatestPosition设为默认值
+                                int position = 0;
+                                for (Integer i : mAnsweredQuestionPositions) {
+                                    if (i == mCurrentPosition) {
+                                        position = i;
+                                        break;
+                                    }
+                                }
+
+                                List<String> questionIds = new ArrayList<String>();
+                                for (int i = mCurrentPosition + 1; i < mAnsweredQuestionPositions.size(); i++) {
+                                    questionIds.add(mTemplateQuestions.get(mAnsweredQuestionPositions.get(i)).getId());
+                                }
+
+                                mAnsweredQuestionPositions = mAnsweredQuestionPositions
+                                        .subList(0, position);
+
+                                App.getCacheRepository().deleteAnsweredQuestions(mUserId, mSurveyId, mStartTime, questionIds);
+                            }
+                        }).setNegativeButton("取消修改", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).create();
+                dialog.show();
+            } else {
+                doLogicJump(currentQuestion, logic);
+            }
         }
     }
 

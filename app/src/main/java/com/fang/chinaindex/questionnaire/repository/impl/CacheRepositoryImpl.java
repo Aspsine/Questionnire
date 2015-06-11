@@ -206,5 +206,10 @@ public class CacheRepositoryImpl implements CacheRepository {
         return questions;
     }
 
+    @Override
+    public void deleteAnsweredQuestions(String userId, String surveyId, String startTime, List<String> questionIds) {
+        
+    }
+
 
 }
