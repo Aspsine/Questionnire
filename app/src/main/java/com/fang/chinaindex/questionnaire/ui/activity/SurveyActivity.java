@@ -58,7 +58,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
     private List<Question> mTemplateQuestions;
     private List<Integer> mAnsweredQuestionPositions;
     private int mCurrentPosition = 0;
-
+    private int mLatestPosition = 0;
 
     public static final class TYPE {
         public static final int SINGLE = 1;   //单选题
@@ -201,18 +201,24 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         if (mCurrentPosition <= 0) {
             return;
         }
-        final Question currentQuestion = mTemplateQuestions.get(mCurrentPosition);
-        L.i("SurveyActivity", "mCurrentPosition = " + mCurrentPosition);
-        List<Option> selectedOptions = getQuestionSelectedOptions(currentQuestion);
-        // true answered;
-        // false not answered;
-        boolean isCurrentQuestionBeenAnswered = selectedOptions.size() > 0;
-        if (isCurrentQuestionBeenAnswered) {
-            //回答了
-            saveQuestion(currentQuestion);
-        } else {
-            mAnsweredQuestionPositions.add(mCurrentPosition);
+        //把最大的currentPosition保存起来。
+        if (mCurrentPosition > mLatestPosition) {
+            mLatestPosition = mCurrentPosition;
+            L.i("SurveyActivity", "mLatestPosition = " + mLatestPosition);
+            final Question latestQuestion = mTemplateQuestions.get(mLatestPosition);
+            List<Option> selectedOptions = getQuestionSelectedOptions(latestQuestion);
+            // true answered;
+            // false not answered;
+            boolean isCurrentQuestionBeenAnswered = selectedOptions.size() > 0;
+            if (isCurrentQuestionBeenAnswered) {
+                //回答了
+                saveQuestion(latestQuestion, true, true);
+            }else {
+                saveQuestion(latestQuestion, true, false);
+            }
         }
+
+        L.i("SurveyActivity", "mCurrentPosition = " + mCurrentPosition);
         int currentPositionIndex = -1;
         for (int i = 0; i < mAnsweredQuestionPositions.size(); i++) {
             if (mCurrentPosition == mAnsweredQuestionPositions.get(i)) {
@@ -241,7 +247,6 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         if (isCurrentQuestionBeenAnswered) {
             //回答了
             handlerAnsweredQuestion(currentQuestion);
-//            App.getCacheRepository().saveAnsweredQuestion(mUserId, mSurveyId, mStartTime, currentQuestion);
         } else {
             //没回答
             handlerNotAnsweredQuestion(currentQuestion);
@@ -255,13 +260,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
      */
     private void handlerAnsweredQuestion(Question currentQuestion) {
         //TODO 保存问题
-        // 1. 判断内存中该问题是否有该问题，如果有，更新该问题，并更新数据库。
-        // 2. 如果没有该问题，则将该问题加入内存列表，并插入数据库
-        saveQuestion(currentQuestion);
-        if (!mAnsweredQuestionPositions.contains(mCurrentPosition)) {
-            mAnsweredQuestionPositions.add(mCurrentPosition);
-            Collections.sort(mAnsweredQuestionPositions);
-        }
+        saveQuestion(currentQuestion, true, true);
 
         Logic logic = getJumpLogic(currentQuestion.getLogics());
         if (logic == null) {
@@ -284,7 +283,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         } else {
             //非必答
             //保存问题
-            saveQuestion(currentQuestion);
+            saveQuestion(currentQuestion, true, true);
             uploadSurveyOrGoToNextIndexQuestion();
         }
     }
@@ -445,9 +444,20 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
      *
      * @param currentQuestion
      */
-    private void saveQuestion(Question currentQuestion) {
-        mAnsweredQuestionPositions.add(mCurrentPosition);
+    private void saveQuestion(Question currentQuestion, boolean savePosition, boolean saveToDB) {
+        //将当前题目的位置保存在内存list中
+        if (savePosition) {
+            if (!mAnsweredQuestionPositions.contains(mCurrentPosition)) {
+                mAnsweredQuestionPositions.add(mCurrentPosition);
+                Collections.sort(mAnsweredQuestionPositions);
+            }
+        }
+
         //TODO save to db
+        if (saveToDB) {
+            App.getCacheRepository().saveAnsweredQuestion(mUserId, mSurveyId, mStartTime, currentQuestion);
+
+        }
     }
 
     /**
