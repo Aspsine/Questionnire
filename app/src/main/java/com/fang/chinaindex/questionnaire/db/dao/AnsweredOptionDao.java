@@ -48,6 +48,9 @@ public class AnsweredOptionDao extends AbstractDao<Option> {
     private void updateIfFailsInsert(String userId, String surveyId, String questionId, String startTime, List<Option> options) {
         ContentValues contentValues = new ContentValues();
         for (Option option : options) {
+            if (!option.isChecked()) {
+                return;
+            }
             ContentValues values = getContentValues(userId, surveyId, questionId, startTime, option, contentValues, true);
             if (db.update(TABLE_NAME, values,
                     "userId = ? and surveyId = ? and questionId = ? and optionId = ? and startTime =?",
