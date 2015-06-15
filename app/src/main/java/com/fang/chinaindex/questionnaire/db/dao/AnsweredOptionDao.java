@@ -49,7 +49,7 @@ public class AnsweredOptionDao extends AbstractDao<Option> {
         ContentValues contentValues = new ContentValues();
         for (Option option : options) {
             if (!option.isChecked()) {
-                return;
+                break;
             }
             ContentValues values = getContentValues(userId, surveyId, questionId, startTime, option, contentValues, true);
             if (db.update(TABLE_NAME, values,
@@ -61,18 +61,20 @@ public class AnsweredOptionDao extends AbstractDao<Option> {
         }
     }
 
-    public List<Option> getAnsweredOptions(String userId, String surveyId, String questionId) {
-        Cursor cursor = db.rawQuery("Select * from " + TABLE_NAME + " where userId=? and surveyId=? and questionId=?", new String[]{userId, surveyId, questionId});
+    public List<Option> getAnsweredOptions(String userId, String surveyId, String questionId, String startTime) {
+        Cursor cursor = db.rawQuery("Select * from " + TABLE_NAME + " where userId=? and surveyId=? and questionId=? and startTime=?", new String[]{userId, surveyId, questionId, startTime});
         List<Option> options = new ArrayList<Option>();
         try {
-            Option option = new Option();
-            option.setId(cursor.getString(cursor.getColumnIndex("optionId")));
-            option.setOptionTitle(cursor.getString(cursor.getColumnIndex("optionTitle")));
-            option.setSort(cursor.getString(cursor.getColumnIndex("sort")));
-            option.setIsOther(Boolean.valueOf(cursor.getString(cursor.getColumnIndex("isOther"))));
-            option.setChecked(Boolean.valueOf(cursor.getString(cursor.getColumnIndex("checked"))));
-            option.setOpenAnswer(cursor.getString(cursor.getColumnIndex("openAnswer")));
-            options.add(option);
+            while (cursor.moveToNext()) {
+                Option option = new Option();
+                option.setId(cursor.getString(cursor.getColumnIndex("optionId")));
+                option.setOptionTitle(cursor.getString(cursor.getColumnIndex("optionTitle")));
+                option.setSort(cursor.getString(cursor.getColumnIndex("sort")));
+                option.setIsOther(Boolean.valueOf(cursor.getString(cursor.getColumnIndex("isOther"))));
+                option.setChecked(Boolean.valueOf(cursor.getString(cursor.getColumnIndex("checked"))));
+                option.setOpenAnswer(cursor.getString(cursor.getColumnIndex("openAnswer")));
+                options.add(option);
+            }
         } finally {
             cursor.close();
         }
@@ -92,5 +94,9 @@ public class AnsweredOptionDao extends AbstractDao<Option> {
         values.put("openAnswer", option.getOpenAnswer());
         values.put("isOther", option.isOther());
         return values;
+    }
+
+    public void deleteOptions(String userId, String surveyId, String questionId, String startTime) {
+        db.delete(TABLE_NAME, "userId=? and surveyId=? and questionId=? and startTime=?", new String[]{userId, surveyId, questionId, startTime});
     }
 }

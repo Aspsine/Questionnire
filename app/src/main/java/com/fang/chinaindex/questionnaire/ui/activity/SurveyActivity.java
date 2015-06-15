@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -91,7 +92,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
             mStartTime = DateUtils.getCurrentDate();
         }
 
-        mStartTime = "test time";
+//        mStartTime = "test time";
 
         mUserId = SharedPrefUtils.getUserId(this);
 
@@ -143,10 +144,12 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         } else {
             //2.如果存在已答题，则展示最后一道已答题在模板题库中的下一道题
             mCurrentPosition = calculatePosition(answeredQuestions);
+            buildAnsweredQuestionPositions(answeredQuestions);
             buildTemplateWithAnsweredQuestions(answeredQuestions);
         }
         showQuestion(mTemplateQuestions.get(mCurrentPosition));
     }
+
 
     /**
      * container fragment of current question.
@@ -206,7 +209,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
             List<Option> selectedOptions = getQuestionSelectedOptions(latestQuestion);
             // true answered;
             // false not answered;
-            boolean isCurrentQuestionBeenAnswered = selectedOptions.size() > 0;
+            boolean isCurrentQuestionBeenAnswered = !selectedOptions.isEmpty();
             if (isCurrentQuestionBeenAnswered) {
                 //回答了
                 saveQuestion(latestQuestion, true, true);
@@ -247,7 +250,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         List<Option> selectedOptions = getQuestionSelectedOptions(currentQuestion);
 
         //true answered, false not answered;
-        boolean isCurrentQuestionBeenAnswered = selectedOptions.size() > 0;
+        boolean isCurrentQuestionBeenAnswered = !selectedOptions.isEmpty();
 
         if (isCurrentQuestionBeenAnswered) {
             //回答了
@@ -287,10 +290,9 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
                                 //3.mLatestPosition设为默认值
                                 //4.doLogicJump(currentQuestion, logic);
                                 int position = 0;
-                                for (Integer i : mAnsweredQuestionPositions) {
-                                    if (i == mCurrentPosition) {
+                                for (int i = 0; i < mAnsweredQuestionPositions.size(); i++) {
+                                    if (mAnsweredQuestionPositions.get(i) == mCurrentPosition) {
                                         position = i;
-                                        break;
                                     }
                                 }
 
@@ -299,16 +301,21 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
                                     questionIds.add(mTemplateQuestions.get(mAnsweredQuestionPositions.get(i)).getId());
                                 }
 
+                                App.getCacheRepository().deleteAnsweredQuestions(mUserId, mSurveyId, mStartTime, questionIds);
+
                                 mAnsweredQuestionPositions = mAnsweredQuestionPositions
                                         .subList(0, position);
 
-                                App.getCacheRepository().deleteAnsweredQuestions(mUserId, mSurveyId, mStartTime, questionIds);
+                                for (int i = mCurrentPosition; i < mTemplateQuestions.size(); i++) {
+                                    List<Option> options = mTemplateQuestions.get(i).getOptions();
+                                    if (options != null && !options.isEmpty()) {
+                                        for (Option o : options) {
+                                            o.setChecked(false);
+                                        }
+                                    }
+                                }
 
-                                doLogicJump(currentQuestion, logic);
-                            }
-                        }).setNegativeButton("取消修改", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
+                                mLatestPosition = 0;
                                 dialog.dismiss();
                                 doLogicJump(currentQuestion, logic);
                             }
@@ -533,6 +540,18 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         throw new IllegalStateException("Questions doesn't contains those answered questions");
     }
 
+    private void buildAnsweredQuestionPositions(List<Question> answeredQuestions) {
+        for (int i = 0, size = mTemplateQuestions.size(); i < size; i++) {
+            Question question = mTemplateQuestions.get(i);
+            for (Question answeredQuestion : answeredQuestions) {
+                if (question.getId().equals(answeredQuestion.getId())) {
+                    mAnsweredQuestionPositions.add(i);
+                    break;
+                }
+            }
+        }
+    }
+
     private void buildTemplateWithAnsweredQuestions(List<Question> answeredQuestions) {
         for (Question templateQuestion : mTemplateQuestions) {
             //TODO TYPE.SORT
@@ -540,11 +559,13 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
                 if (answeredQuestion.getId().equals(templateQuestion.getId())) {
                     for (Option templateOption : templateQuestion.getOptions()) {
                         if (answeredQuestion.getOptions() == null) {
+                            L.i(TAG, "buildTemplateWithAnsweredQuestions = " + "break");
                             break;
                         }
                         for (Option answeredOption : answeredQuestion.getOptions()) {
                             if (answeredOption.getId().equals(templateOption.getId())) {
                                 templateOption.setChecked(true);
+                                L.i(TAG, "buildTemplateWithAnsweredQuestions = " + templateOption.getOptionTitle());
                                 break;
                             }
                         }

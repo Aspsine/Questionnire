@@ -183,11 +183,11 @@ public class CacheRepositoryImpl implements CacheRepository {
         AnsweredQuestionDao answeredQuestionDao = daoSession.getAnsweredQuestionDao();
         AnsweredOptionDao answeredOptionDao = daoSession.getAnsweredOptionDao();
         db.beginTransaction();
-        try{
+        try {
             answeredQuestionDao.save(userId, surveyId, startTime, question);
-            answeredOptionDao.save(userId, surveyId, question.getId(), startTime,question.getOptions());
+            answeredOptionDao.save(userId, surveyId, question.getId(), startTime, question.getOptions());
             db.setTransactionSuccessful();
-        }finally {
+        } finally {
             db.endTransaction();
         }
     }
@@ -195,10 +195,15 @@ public class CacheRepositoryImpl implements CacheRepository {
     @Override
     public List<Question> getAnsweredQuestions(String userId, String surveyId, String startTime) {
         AnsweredQuestionDao answeredQuestionDao = daoSession.getAnsweredQuestionDao();
+        AnsweredOptionDao optionDao = daoSession.getAnsweredOptionDao();
         List<Question> questions = null;
         db.beginTransaction();
         try {
             questions = answeredQuestionDao.getAnsweredQuestions(userId, surveyId, startTime);
+            for (Question question : questions) {
+                List<Option> options = optionDao.getAnsweredOptions(userId, surveyId, question.getId(), startTime);
+                question.setOptions(options);
+            }
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
@@ -208,8 +213,19 @@ public class CacheRepositoryImpl implements CacheRepository {
 
     @Override
     public void deleteAnsweredQuestions(String userId, String surveyId, String startTime, List<String> questionIds) {
-        
+        //清理 currentPosition之后的所有数据库中保存的AnsweredQuestion和对应的AnsweredOption
+        AnsweredQuestionDao answeredQuestionDao = daoSession.getAnsweredQuestionDao();
+        AnsweredOptionDao answeredOptionDao = daoSession.getAnsweredOptionDao();
+        db.beginTransaction();
+        try {
+            for (String questionId : questionIds) {
+                answeredQuestionDao.deleteAnsweredQuestions(userId, surveyId, questionId, startTime);
+                answeredOptionDao.deleteOptions(userId, surveyId, questionId, startTime);
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
     }
-
 
 }
