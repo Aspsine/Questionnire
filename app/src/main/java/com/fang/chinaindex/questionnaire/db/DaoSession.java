@@ -4,6 +4,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.fang.chinaindex.questionnaire.db.dao.AnsweredOptionDao;
 import com.fang.chinaindex.questionnaire.db.dao.AnsweredQuestionDao;
+import com.fang.chinaindex.questionnaire.db.dao.AnsweredSurveyInfoDao;
 import com.fang.chinaindex.questionnaire.db.dao.LogicDao;
 import com.fang.chinaindex.questionnaire.db.dao.OptionDao;
 import com.fang.chinaindex.questionnaire.db.dao.QuestionDao;
@@ -29,8 +30,10 @@ public class DaoSession {
 
     private final LogicDao logicDao;
 
+    private final AnsweredSurveyInfoDao answeredSurveyInfoDao;
+
     private final AnsweredQuestionDao answeredQuestionDao;
-    private AnsweredOptionDao answeredOptionDao;
+    private final AnsweredOptionDao answeredOptionDao;
 
     public DaoSession(SQLiteDatabase db) {
         this.db = db;
@@ -42,6 +45,7 @@ public class DaoSession {
         this.optionDao = new OptionDao(db);
         this.logicDao = new LogicDao(db);
 
+        this.answeredSurveyInfoDao = new AnsweredSurveyInfoDao(db);
         this.answeredQuestionDao = new AnsweredQuestionDao(db);
         this.answeredOptionDao = new AnsweredOptionDao(db);
     }
@@ -72,6 +76,10 @@ public class DaoSession {
 
     public LogicDao getLogicDao() {
         return logicDao;
+    }
+
+    public AnsweredSurveyInfoDao getAnsweredSurveyInfoDao() {
+        return answeredSurveyInfoDao;
     }
 
     public AnsweredQuestionDao getAnsweredQuestionDao() {

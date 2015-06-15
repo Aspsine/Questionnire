@@ -38,7 +38,6 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
     private static final String TAG = SurveyActivity.class.getSimpleName();
     public static final String START_TIME_NONE = "start_time_none";
 
-    private ProgressDialog pDialog;
     private Button btnUp, btnNext;
 
     private String mUserId;
@@ -88,11 +87,6 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         Intent intent = getIntent();
         mSurveyId = intent.getStringExtra("EXTRA_SURVEY_ID");
         mStartTime = intent.getStringExtra("EXTRA_SURVEY_START_TIME");
-        if (TextUtils.isEmpty(mStartTime)) {
-            mStartTime = DateUtils.getCurrentDate();
-        }
-
-//        mStartTime = "test time";
 
         mUserId = SharedPrefUtils.getUserId(this);
 
@@ -104,6 +98,12 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
 
         initTemplateSurvey();
         initAnsweredSurvey();
+
+        if (TextUtils.isEmpty(mStartTime)) {
+            mStartTime = DateUtils.getCurrentDate();
+            saveSurvey();
+        }
+        //        mStartTime = "test time";
     }
 
     @Override
@@ -513,15 +513,21 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         //TODO save to db
         if (saveToDB) {
             App.getCacheRepository().saveAnsweredQuestion(mUserId, mSurveyId, mStartTime, currentQuestion);
-
         }
+    }
+
+    /**
+     * db save survey
+     */
+    private void saveSurvey() {
+        App.getCacheRepository().saveAnsweredSurvey(mUserId, mStartTime, "", mSurveyInfo);
     }
 
     /**
      * db delete survey
      */
     private void deleteSurvey() {
-
+        App.getCacheRepository().deleteAnsweredSurvey(mUserId, mSurveyId, mStartTime);
     }
 
     /**
@@ -616,20 +622,5 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
 //            }
 //        }
 //    }
-
-    private void show() {
-        if (pDialog == null) {
-            pDialog = new ProgressDialog(this);
-            pDialog.setMessage("wait...");
-        }
-        pDialog.show();
-    }
-
-    private void dismiss() {
-        if (pDialog != null && pDialog.isShowing()) {
-            pDialog.dismiss();
-        }
-    }
-
 
 }

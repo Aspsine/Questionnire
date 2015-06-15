@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.fang.chinaindex.questionnaire.db.DaoSession;
 import com.fang.chinaindex.questionnaire.db.dao.AnsweredOptionDao;
 import com.fang.chinaindex.questionnaire.db.dao.AnsweredQuestionDao;
+import com.fang.chinaindex.questionnaire.db.dao.AnsweredSurveyInfoDao;
 import com.fang.chinaindex.questionnaire.db.dao.LogicDao;
 import com.fang.chinaindex.questionnaire.db.dao.OptionDao;
 import com.fang.chinaindex.questionnaire.db.dao.QuestionDao;
@@ -222,6 +223,34 @@ public class CacheRepositoryImpl implements CacheRepository {
                 answeredQuestionDao.deleteAnsweredQuestions(userId, surveyId, questionId, startTime);
                 answeredOptionDao.deleteOptions(userId, surveyId, questionId, startTime);
             }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    @Override
+    public void saveAnsweredSurvey(String userId, String startTime, String endTime, SurveyInfo surveyInfo) {
+        AnsweredSurveyInfoDao answeredSurveyInfoDao = daoSession.getAnsweredSurveyInfoDao();
+        db.beginTransaction();
+        try {
+            answeredSurveyInfoDao.save(userId, startTime, "", surveyInfo);
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    @Override
+    public void deleteAnsweredSurvey(String userId, String surveyId, String startTime) {
+        AnsweredSurveyInfoDao answeredSurveyInfoDao = daoSession.getAnsweredSurveyInfoDao();
+        AnsweredQuestionDao answeredQuestionDao = daoSession.getAnsweredQuestionDao();
+        AnsweredOptionDao answeredOptionDao = daoSession.getAnsweredOptionDao();
+        db.beginTransaction();
+        try {
+            answeredSurveyInfoDao.delete(userId, surveyId, startTime);
+            answeredQuestionDao.delete(userId, surveyId,startTime);
+            answeredOptionDao.delete(userId, surveyId, startTime);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();

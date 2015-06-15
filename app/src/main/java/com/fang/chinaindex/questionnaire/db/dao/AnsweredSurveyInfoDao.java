@@ -99,4 +99,8 @@ public class AnsweredSurveyInfoDao extends AbstractDao<SurveyInfo> {
         }
         return surveyInfos;
     }
+
+    public void delete(String userId, String surveyId, String startTime) {
+        db.delete(TABLE_NAME, "userId=? and surveyId=? and startTime=?", new String[]{userId, surveyId, startTime});
+    }
 }

@@ -96,6 +96,10 @@ public class AnsweredOptionDao extends AbstractDao<Option> {
         return values;
     }
 
+    public void delete(String userId, String surveyId, String startTime) {
+        db.delete(TABLE_NAME, "userId=? and surveyId=? and startTime=?", new String[]{userId, surveyId, startTime});
+    }
+
     public void deleteOptions(String userId, String surveyId, String questionId, String startTime) {
         db.delete(TABLE_NAME, "userId=? and surveyId=? and questionId=? and startTime=?", new String[]{userId, surveyId, questionId, startTime});
     }
