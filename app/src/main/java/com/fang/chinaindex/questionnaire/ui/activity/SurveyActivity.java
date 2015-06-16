@@ -96,14 +96,19 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         btnNext.setOnClickListener(this);
         btnUp.setOnClickListener(this);
 
-        initTemplateSurvey();
-        initAnsweredSurvey();
+        String tmpStartTime = mStartTime;
 
         if (TextUtils.isEmpty(mStartTime)) {
             mStartTime = DateUtils.getCurrentDate();
-            saveSurvey();
         }
         //        mStartTime = "test time";
+
+        initTemplateSurvey();
+        initAnsweredSurvey();
+
+        if(TextUtils.isEmpty(tmpStartTime)){
+            saveSurvey();
+        }
     }
 
     @Override
@@ -268,6 +273,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
      */
     private void handlerAnsweredQuestion(final Question currentQuestion) {
         //TODO 保存问题
+        L.i("handlerAnsweredQuestion:" + currentQuestion.getQuestionTitle());
         saveQuestion(currentQuestion, true, true);
 
         final Logic logic = getJumpLogic(currentQuestion.getLogics());
@@ -303,8 +309,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
 
                                 App.getCacheRepository().deleteAnsweredQuestions(mUserId, mSurveyId, mStartTime, questionIds);
 
-                                mAnsweredQuestionPositions = mAnsweredQuestionPositions
-                                        .subList(0, position);
+                                mAnsweredQuestionPositions = mAnsweredQuestionPositions.subList(0, position);
 
                                 for (int i = mCurrentPosition; i < mTemplateQuestions.size(); i++) {
                                     List<Option> options = mTemplateQuestions.get(i).getOptions();

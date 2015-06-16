@@ -43,6 +43,10 @@ public class DaoMaster {
         QuestionDao.dropTable(db);
         OptionDao.dropTable(db);
         LogicDao.dropTable(db);
+
+        AnsweredSurveyInfoDao.dropTable(db);
+        AnsweredQuestionDao.dropTable(db);
+        AnsweredOptionDao.dropTable(db);
     }
 
     public DaoSession newSession() {

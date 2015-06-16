@@ -30,11 +30,11 @@ public class AnsweredSurveyInfoDao extends AbstractDao<SurveyInfo> {
             "companyName text";
 
     public static final void createTable(SQLiteDatabase db) {
-        SQLUtils.createTable(TABLE_NAME, PARAMS);
+        db.execSQL(SQLUtils.createTable(TABLE_NAME, PARAMS));
     }
 
     public static final void dropTable(SQLiteDatabase db) {
-        SQLUtils.createTable(TABLE_NAME, PARAMS);
+        db.execSQL(SQLUtils.createTable(TABLE_NAME, PARAMS));
     }
 
     public AnsweredSurveyInfoDao(SQLiteDatabase db) {
