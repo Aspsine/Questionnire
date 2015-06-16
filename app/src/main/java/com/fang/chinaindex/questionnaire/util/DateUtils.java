@@ -1,6 +1,8 @@
 package com.fang.chinaindex.questionnaire.util;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -21,7 +23,13 @@ public class DateUtils {
      * @param endTime
      * @return
      */
-    public static String getFormattedTime(String endTime) {
-        return SIMPLE_DATE_FORMAT_ONE.format(endTime);
+    public static String getFormattedTime(String endTime){
+        Date date = null;
+        try {
+            date = SIMPLE_DATE_FORMAT_ONE.parse(endTime);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return SIMPLE_DATE_FORMAT_ONE.format(date);
     }
 }

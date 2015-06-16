@@ -27,6 +27,7 @@ import com.fang.chinaindex.questionnaire.util.MD5;
 import com.google.gson.Gson;
 
 import java.net.URLEncoder;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -203,8 +204,8 @@ public class NetRepositoryImpl implements NetRepository {
 
                 Map<String, String> params = new HashMap<String, String>();
                 String surveyId = answeredSurvey.getInfo().getSurveyId();
-                String startTime = DateUtils.getFormattedTime(answeredSurvey.getInfo().getStartTime());
-                String endTime = DateUtils.getFormattedTime(answeredSurvey.getInfo().getEndTime());
+                String startTime = answeredSurvey.getInfo().getStartTime();
+                String endTime = answeredSurvey.getInfo().getEndTime();
                 try {
                     String sUserId = DES.encryptDES(userId, Constants.CONFIG.ENCRYPT_KEY);
                     String sSurveyId = DES.encryptDES(surveyId, Constants.CONFIG.ENCRYPT_KEY);

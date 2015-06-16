@@ -12,10 +12,13 @@ import android.widget.Toast;
 import com.fang.chinaindex.questionnaire.App;
 import com.fang.chinaindex.questionnaire.R;
 import com.fang.chinaindex.questionnaire.model.Logic;
+import com.fang.chinaindex.questionnaire.model.Login;
 import com.fang.chinaindex.questionnaire.model.Option;
 import com.fang.chinaindex.questionnaire.model.Question;
 import com.fang.chinaindex.questionnaire.model.Survey;
 import com.fang.chinaindex.questionnaire.model.SurveyInfo;
+import com.fang.chinaindex.questionnaire.model.UploadSampleResult;
+import com.fang.chinaindex.questionnaire.repository.Repository;
 import com.fang.chinaindex.questionnaire.ui.fragment.MultiChoiceFragment;
 import com.fang.chinaindex.questionnaire.ui.fragment.OpenFragment;
 import com.fang.chinaindex.questionnaire.ui.fragment.QuestionBaseFragment;
@@ -120,6 +123,24 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
                 break;
         }
     }
+
+//    @Override
+//    public void onBackPressed() {
+//        Question currentQuestion = mTemplateQuestions.get(mCurrentPosition);
+//        List<Option> selectedOptions = getQuestionSelectedOptions(currentQuestion);
+//        // true answered;
+//        // false not answered;
+//        boolean isCurrentQuestionBeenAnswered = !selectedOptions.isEmpty();
+//        if (isCurrentQuestionBeenAnswered){
+//            Logic logic = getJumpLogic(currentQuestion.getLogics());
+//            if (logic!=null){
+//
+//            }
+//        }else {
+//
+//        }
+//        super.onBackPressed();
+//    }
 
     private void initTemplateSurvey() {
         mTemplateSurvey = App.getCacheRepository().getSurvey(mSurveyId);
@@ -372,6 +393,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
 
     /**
      * 是否是模版问卷中的最后一题
+     * FIXME 用这个来判断是否提交还是有点问题的！
      *
      * @return
      */
@@ -485,6 +507,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(SurveyActivity.this, "upload click", Toast.LENGTH_SHORT).show();
+                        uploadSurvey();
                         dialog.dismiss();
                     }
                 })
@@ -498,6 +521,37 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
                 })
                 .create();
         dialog.show();
+    }
+
+    private void uploadSurvey() {
+        Survey survey = new Survey();
+        survey.setInfo(mSurveyInfo);
+        List<Question> answeredQuestions = new ArrayList<Question>();
+        for (Integer i : mAnsweredQuestionPositions) {
+            List<Option> options = new ArrayList<Option>();
+            Question question = mTemplateQuestions.get(i);
+            for (Option option : question.getOptions()) {
+                if (option.isChecked()) {
+                    options.add(option);
+                }
+            }
+            question.setOptions(options);
+            answeredQuestions.add(question);
+        }
+        survey.setQuestions(answeredQuestions);
+        App.getRepository().uploadSample(mUserId, survey, new Repository.Callback<UploadSampleResult>() {
+            @Override
+            public void success(UploadSampleResult uploadSampleResult) {
+                Toast.makeText(SurveyActivity.this, "upload success!", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+
+            @Override
+            public void failure(Exception e) {
+                e.printStackTrace();
+                Toast.makeText(SurveyActivity.this, "upload error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     /**
