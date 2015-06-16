@@ -48,16 +48,15 @@ public class AnsweredOptionDao extends AbstractDao<Option> {
     private void updateIfFailsInsert(String userId, String surveyId, String questionId, String startTime, List<Option> options) {
         ContentValues contentValues = new ContentValues();
         for (Option option : options) {
-            if (!option.isChecked()) {
-                break;
+            if (option.isChecked()) {
+                ContentValues values = getContentValues(userId, surveyId, questionId, startTime, option, contentValues, true);
+                if (db.update(TABLE_NAME, values,
+                        "userId = ? and surveyId = ? and questionId = ? and optionId = ? and startTime =?",
+                        new String[]{userId, surveyId, questionId, option.getId(), startTime}) == 0) {
+                    db.insert(TABLE_NAME, null, values);
+                }
+                contentValues.clear();
             }
-            ContentValues values = getContentValues(userId, surveyId, questionId, startTime, option, contentValues, true);
-            if (db.update(TABLE_NAME, values,
-                    "userId = ? and surveyId = ? and questionId = ? and optionId = ? and startTime =?",
-                    new String[]{userId, surveyId, questionId, option.getId(), startTime}) == 0) {
-                db.insert(TABLE_NAME, null, values);
-            }
-            contentValues.clear();
         }
     }
 

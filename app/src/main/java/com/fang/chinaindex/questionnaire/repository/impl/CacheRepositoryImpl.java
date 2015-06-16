@@ -230,11 +230,11 @@ public class CacheRepositoryImpl implements CacheRepository {
     }
 
     @Override
-    public void saveAnsweredSurvey(String userId, String startTime, String endTime, SurveyInfo surveyInfo) {
+    public void saveAnsweredSurvey(String userId, SurveyInfo surveyInfo) {
         AnsweredSurveyInfoDao answeredSurveyInfoDao = daoSession.getAnsweredSurveyInfoDao();
         db.beginTransaction();
         try {
-            answeredSurveyInfoDao.save(userId, startTime, "", surveyInfo);
+            answeredSurveyInfoDao.save(userId, surveyInfo);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();

@@ -21,7 +21,8 @@ public class AnsweredSurveyInfoDao extends AbstractDao<SurveyInfo> {
     private static final String PARAMS = "surveyId long, " +
             "userId long, " +
             "startTime text, " + // start time of the survey
-            "endTime text," +    // end time of the survey
+            "endTime text, " +    // end time of the survey
+            "finished text, " +
             "title text, " +
             "updateTime text, " +
             "collectionEndTime text, " +
@@ -41,23 +42,24 @@ public class AnsweredSurveyInfoDao extends AbstractDao<SurveyInfo> {
         super(db);
     }
 
-    public void save(String userId, String startTime, String endTime, SurveyInfo surveyInfo) {
-        updateIfFailsInsert(userId, startTime, endTime, surveyInfo);
+    public void save(String userId, SurveyInfo surveyInfo) {
+        updateIfFailsInsert(userId, surveyInfo);
     }
 
-    private void updateIfFailsInsert(String userId, String startTime, String endTime, SurveyInfo surveyInfo) {
+    private void updateIfFailsInsert(String userId, SurveyInfo surveyInfo) {
         ContentValues values = new ContentValues();
         values.put("userId", userId);
-        values.put("startTime", startTime);
-        values.put("endTime", endTime);
         values.put("surveyId", surveyInfo.getSurveyId());
+        values.put("startTime", surveyInfo.getStartTime());
+        values.put("endTime", surveyInfo.getEndTime());
+        values.put("finished", surveyInfo.isFinished());
         values.put("title", surveyInfo.getTitle());
         values.put("updateTime", surveyInfo.getUpdateTime());
         values.put("collectionEndTime", surveyInfo.getCollectionEndTime());
         values.put("typeId", surveyInfo.getTypeId());
         values.put("typeName", surveyInfo.getTypeName());
         values.put("companyName", surveyInfo.getCompanyName());
-        if (db.update(TABLE_NAME, values, "surveyId=? and userId=? and startTime=?", new String[]{surveyInfo.getSurveyId(), userId}) == 0) {
+        if (db.update(TABLE_NAME, values, "surveyId=? and userId=? and startTime=?", new String[]{surveyInfo.getSurveyId(), userId, surveyInfo.getStartTime()}) == 0) {
             db.insert(TABLE_NAME, null, values);
         }
     }
@@ -68,6 +70,7 @@ public class AnsweredSurveyInfoDao extends AbstractDao<SurveyInfo> {
         try {
             cursor.moveToFirst();
             surveyInfo.setSurveyId(cursor.getString(cursor.getColumnIndex("surveyId")));
+            surveyInfo.setFinished(Boolean.valueOf(cursor.getString(cursor.getColumnIndex("finished"))));
             surveyInfo.setTitle(cursor.getString(cursor.getColumnIndex("title")));
             surveyInfo.setUpdateTime(cursor.getString(cursor.getColumnIndex("updateTime")));
             surveyInfo.setCollectionEndTime(cursor.getString(cursor.getColumnIndex("collectionEndTime")));

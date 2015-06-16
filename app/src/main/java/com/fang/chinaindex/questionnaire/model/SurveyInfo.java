@@ -31,6 +31,11 @@ public class SurveyInfo {
      */
     private String endTime;
 
+    /**
+     * 是否已完成答卷
+     */
+    private boolean finished;
+
     public String getSurveyId() {
         return surveyId;
     }
@@ -101,5 +106,13 @@ public class SurveyInfo {
 
     public void setEndTime(String endTime) {
         this.endTime = endTime;
+    }
+
+    public void setFinished(boolean finished) {
+        this.finished = finished;
+    }
+
+    public boolean isFinished() {
+        return finished;
     }
 }

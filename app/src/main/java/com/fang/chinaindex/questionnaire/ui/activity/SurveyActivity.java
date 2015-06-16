@@ -1,12 +1,10 @@
 package com.fang.chinaindex.questionnaire.ui.activity;
 
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -106,8 +104,8 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         initTemplateSurvey();
         initAnsweredSurvey();
 
-        if(TextUtils.isEmpty(tmpStartTime)){
-            saveSurvey();
+        if (TextUtils.isEmpty(tmpStartTime)) {
+            saveSurvey(false);
         }
     }
 
@@ -295,23 +293,23 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
                                 //2.清理 currentPosition之后的所有数据库中保存的AnsweredQuestion和对应的AnsweredOption
                                 //3.mLatestPosition设为默认值
                                 //4.doLogicJump(currentQuestion, logic);
-                                int position = 0;
+                                int currentPositionIndex = 0;
                                 for (int i = 0; i < mAnsweredQuestionPositions.size(); i++) {
                                     if (mAnsweredQuestionPositions.get(i) == mCurrentPosition) {
-                                        position = i;
+                                        currentPositionIndex = i;
                                     }
                                 }
 
                                 List<String> questionIds = new ArrayList<String>();
-                                for (int i = mCurrentPosition + 1; i < mAnsweredQuestionPositions.size(); i++) {
+                                for (int i = currentPositionIndex + 1; i < mAnsweredQuestionPositions.size(); i++) {
                                     questionIds.add(mTemplateQuestions.get(mAnsweredQuestionPositions.get(i)).getId());
                                 }
 
                                 App.getCacheRepository().deleteAnsweredQuestions(mUserId, mSurveyId, mStartTime, questionIds);
 
-                                mAnsweredQuestionPositions = mAnsweredQuestionPositions.subList(0, position);
+                                mAnsweredQuestionPositions = mAnsweredQuestionPositions.subList(0, currentPositionIndex + 1);
 
-                                for (int i = mCurrentPosition; i < mTemplateQuestions.size(); i++) {
+                                for (int i = mCurrentPosition + 1; i < mTemplateQuestions.size(); i++) {
                                     List<Option> options = mTemplateQuestions.get(i).getOptions();
                                     if (options != null && !options.isEmpty()) {
                                         for (Option o : options) {
@@ -460,6 +458,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
     }
 
     private void prepareUpload() {
+        saveSurvey(true);
         showUpLoadDialog();
     }
 
@@ -524,8 +523,11 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
     /**
      * db save survey
      */
-    private void saveSurvey() {
-        App.getCacheRepository().saveAnsweredSurvey(mUserId, mStartTime, "", mSurveyInfo);
+    private void saveSurvey(boolean finished) {
+        mSurveyInfo.setStartTime(mStartTime);
+        mSurveyInfo.setEndTime(DateUtils.getCurrentDate());
+        mSurveyInfo.setFinished(finished);
+        App.getCacheRepository().saveAnsweredSurvey(mUserId, mSurveyInfo);
     }
 
     /**

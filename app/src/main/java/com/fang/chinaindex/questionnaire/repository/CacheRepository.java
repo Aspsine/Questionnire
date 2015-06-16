@@ -32,7 +32,7 @@ public interface CacheRepository {
 
     public void deleteAnsweredQuestions(String userId, String surveyId, String startTime, List<String> questionIds);
 
-    public void saveAnsweredSurvey(String userId, String startTime, String endTime, SurveyInfo surveyInfo);
+    public void saveAnsweredSurvey(String userId, SurveyInfo surveyInfo);
 
     public void deleteAnsweredSurvey(String userId, String surveyId, String startTime);
 }
