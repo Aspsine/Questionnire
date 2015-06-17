@@ -197,7 +197,7 @@ public class NetRepositoryImpl implements NetRepository {
                 for (Question question : questions) {
                     List<Option> options = question.getOptions();
                     for (Option option : options) {
-                        SurveyAnswer surveyAnswer = new SurveyAnswer(question.getId(), option.getId(), option.getOpenAnswer(), question.getAnsweredTime(), option.getSort());
+                        SurveyAnswer surveyAnswer = new SurveyAnswer(question.getId(), option.getId(), option.getOpenAnswer(), answeredSurvey.getInfo().getStartTime(), option.getSort());
                         surveyAnswers.add(surveyAnswer);
                     }
                 }

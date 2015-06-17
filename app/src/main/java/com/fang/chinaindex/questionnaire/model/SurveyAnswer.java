@@ -4,10 +4,25 @@ package com.fang.chinaindex.questionnaire.model;
  * Created by Aspsine on 2015/5/5.
  */
 public class SurveyAnswer {
+    /**
+     * 问题Id
+     */
     private String IQuestionID;
+    /**
+     * 回答选项Id
+     */
     private String SAnswers;
+    /**
+     * 开放题或者开放选项存的值(urlEncode)
+     */
     private String SAnswersNote;
+    /**
+     * 问题回答时间
+     */
     private String DAddTime;
+    /**
+     * 排序字段(只有在排序题中起作用，其他默认为1)
+     */
     private String ISort;
 
     public SurveyAnswer() {
