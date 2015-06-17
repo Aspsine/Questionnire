@@ -77,6 +77,14 @@ public class OptionDragSortAdapter extends RecyclerView.Adapter<OptionDragSortAd
         return Long.valueOf(mOptions.get(position).getId());
     }
 
+    private void sort() {
+        int i = 1;
+        for (Option option : mOptions) {
+            option.setSort(String.valueOf(i));
+            i++;
+        }
+    }
+
     public void setChecked(int position) {
         Option option = mOptions.get(position);
         boolean isChecked = option.isChecked();
@@ -89,6 +97,7 @@ public class OptionDragSortAdapter extends RecyclerView.Adapter<OptionDragSortAd
         notifyItemRangeChanged(position <= firstUncheckedPos ? position : firstUncheckedPos,
                 Math.abs(position - firstUncheckedPos) + 1);
         mItemMovedListener.onItemMoved(position, firstUncheckedPos);
+        sort();
     }
 
 
@@ -127,6 +136,7 @@ public class OptionDragSortAdapter extends RecyclerView.Adapter<OptionDragSortAd
         final Option option = mOptions.remove(fromPosition);
         mOptions.add(toPosition, option);
         notifyItemMoved(fromPosition, toPosition);
+        sort();
     }
 
     @Override

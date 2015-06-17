@@ -12,7 +12,6 @@ import android.widget.Toast;
 import com.fang.chinaindex.questionnaire.App;
 import com.fang.chinaindex.questionnaire.R;
 import com.fang.chinaindex.questionnaire.model.Logic;
-import com.fang.chinaindex.questionnaire.model.Login;
 import com.fang.chinaindex.questionnaire.model.Option;
 import com.fang.chinaindex.questionnaire.model.Question;
 import com.fang.chinaindex.questionnaire.model.Survey;
@@ -34,7 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- *TODO 排序题
+ * TODO 排序题
  */
 public class SurveyActivity extends BaseActivity implements View.OnClickListener {
     private static final String TAG = SurveyActivity.class.getSimpleName();
@@ -103,7 +102,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         if (TextUtils.isEmpty(mStartTime)) {
             mStartTime = DateUtils.getCurrentDate();
         }
-                mStartTime = "test time";
+        mStartTime = "test time";
 
         initTemplateSurvey();
         initAnsweredSurvey();
@@ -127,19 +126,32 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
 
 //    @Override
 //    public void onBackPressed() {
+//        String message = "Save into unfinished.";
+//
 //        Question currentQuestion = mTemplateQuestions.get(mCurrentPosition);
 //        List<Option> selectedOptions = getQuestionSelectedOptions(currentQuestion);
 //        // true answered;
 //        // false not answered;
-//        boolean isCurrentQuestionBeenAnswered = !selectedOptions.isEmpty();
-//        if (isCurrentQuestionBeenAnswered){
-//            Logic logic = getJumpLogic(currentQuestion.getLogics());
-//            if (logic!=null){
-//
-//            }
+//        if(isLastQuestionInTemplate()){
+//            message = "Save into submit.";
 //        }else {
+//            boolean isCurrentQuestionBeenAnswered = !selectedOptions.isEmpty();
+//            if (isCurrentQuestionBeenAnswered) {
+//                Logic logic = getJumpLogic(currentQuestion.getLogics());
+//                if (logic != null) {
+//                    if (Integer.valueOf(logic.getLogicType()) == LOGIC_TYPE.FINISH_SURVEY){
+//                        message = "Save into submit.";
+//                    }
+//                }
+//            }else {
+//                if (Boolean.valueOf(currentQuestion.getIsMust())){
 //
+//                }else {
+//
+//                }
+//            }
 //        }
+//
 //        super.onBackPressed();
 //    }
 
@@ -573,9 +585,9 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         if (saveToDB) {
             //if current question is sort question, sort before save to db;
             List<Option> options = currentQuestion.getOptions();
-            for (int i = 0, size = options.size(); i < size; i++) {
-                if (Integer.valueOf(currentQuestion.getCategory()) == TYPE.SORT) {
-                    options.get(i).setSort(String.valueOf(i + 1));
+            if (Integer.valueOf(currentQuestion.getCategory()) == TYPE.SORT) {
+                if (options != null && !options.isEmpty()) {
+                    Collections.sort(options);
                 }
             }
             App.getCacheRepository().saveAnsweredQuestion(mUserId, mSurveyId, mStartTime, currentQuestion);
@@ -585,6 +597,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
     /**
      * db save survey
      */
+
     private void saveSurvey(boolean finished) {
         mSurveyInfo.setStartTime(mStartTime);
         mSurveyInfo.setEndTime(DateUtils.getCurrentDate());
