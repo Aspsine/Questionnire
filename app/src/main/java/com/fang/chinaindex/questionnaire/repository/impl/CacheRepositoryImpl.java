@@ -186,6 +186,7 @@ public class CacheRepositoryImpl implements CacheRepository {
         db.beginTransaction();
         try {
             answeredQuestionDao.save(userId, surveyId, startTime, question);
+            answeredOptionDao.deleteOptions(userId, surveyId, question.getId(), startTime);
             answeredOptionDao.save(userId, surveyId, question.getId(), startTime, question.getOptions());
             db.setTransactionSuccessful();
         } finally {
@@ -249,7 +250,7 @@ public class CacheRepositoryImpl implements CacheRepository {
         db.beginTransaction();
         try {
             answeredSurveyInfoDao.delete(userId, surveyId, startTime);
-            answeredQuestionDao.delete(userId, surveyId,startTime);
+            answeredQuestionDao.delete(userId, surveyId, startTime);
             answeredOptionDao.delete(userId, surveyId, startTime);
             db.setTransactionSuccessful();
         } finally {

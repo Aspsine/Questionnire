@@ -30,10 +30,11 @@ import com.fang.chinaindex.questionnaire.util.SharedPrefUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
- *
+ *TODO 排序题
  */
 public class SurveyActivity extends BaseActivity implements View.OnClickListener {
     private static final String TAG = SurveyActivity.class.getSimpleName();
@@ -102,7 +103,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         if (TextUtils.isEmpty(mStartTime)) {
             mStartTime = DateUtils.getCurrentDate();
         }
-        //        mStartTime = "test time";
+                mStartTime = "test time";
 
         initTemplateSurvey();
         initAnsweredSurvey();
@@ -570,6 +571,13 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
 
         //TODO save to db
         if (saveToDB) {
+            //if current question is sort question, sort before save to db;
+            List<Option> options = currentQuestion.getOptions();
+            for (int i = 0, size = options.size(); i < size; i++) {
+                if (Integer.valueOf(currentQuestion.getCategory()) == TYPE.SORT) {
+                    options.get(i).setSort(String.valueOf(i + 1));
+                }
+            }
             App.getCacheRepository().saveAnsweredQuestion(mUserId, mSurveyId, mStartTime, currentQuestion);
         }
     }
@@ -621,27 +629,56 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
 
     private void buildTemplateWithAnsweredQuestions(List<Question> answeredQuestions) {
         for (Question templateQuestion : mTemplateQuestions) {
-            //TODO TYPE.SORT
             for (Question answeredQuestion : answeredQuestions) {
                 if (answeredQuestion.getId().equals(templateQuestion.getId())) {
-                    for (Option templateOption : templateQuestion.getOptions()) {
-                        if (answeredQuestion.getOptions() == null) {
-                            L.i(TAG, "buildTemplateWithAnsweredQuestions = " + "break");
-                            break;
-                        }
-                        for (Option answeredOption : answeredQuestion.getOptions()) {
-                            if (answeredOption.getId().equals(templateOption.getId())) {
-                                templateOption.setChecked(true);
-                                L.i(TAG, "buildTemplateWithAnsweredQuestions = " + templateOption.getOptionTitle());
-                                break;
-                            }
-                        }
+                    List<Option> templateOptions = templateQuestion.getOptions();
+                    List<Option> answeredOptions = answeredQuestion.getOptions();
+                    if (answeredOptions == null) {
+                        break;
+                    }
+                    if (Integer.valueOf(templateQuestion.getCategory()) == TYPE.SORT) {
+                        buildSortedOptions(templateOptions, answeredOptions);
+                    } else {
+                        buildNormalOptions(templateOptions, answeredOptions);
                     }
                 }
             }
         }
     }
 
+    private void buildSortedOptions(List<Option> templateOptions, List<Option> answeredOptions) {
+        Collections.sort(answeredOptions);
+        for (Option answeredOption : answeredOptions) {
+            answeredOption.setChecked(true);
+            Iterator<Option> iterator = templateOptions.iterator();
+            while (iterator.hasNext()) {
+                Option o = iterator.next();
+                if (o.getId().equals(answeredOption.getId())) {
+                    iterator.remove();
+                    break;
+                }
+            }
+        }
+        templateOptions.addAll(0, answeredOptions);
+        int sort = 1;
+        for (Option option : templateOptions) {
+            option.setSort(String.valueOf(sort));
+            sort++;
+        }
+        Collections.sort(templateOptions);
+    }
+
+    private void buildNormalOptions(List<Option> templateOptions, List<Option> answeredOptions) {
+        for (Option templateOption : templateOptions) {
+            for (Option answeredOption : answeredOptions) {
+                if (answeredOption.getId().equals(templateOption.getId())) {
+                    templateOption.setChecked(true);
+                    L.i(TAG, "buildTemplateWithAnsweredQuestions = " + templateOption.getOptionTitle());
+                    break;
+                }
+            }
+        }
+    }
 
 //    private void buildQuestionWithAnswer(Question question) {
 //        Question answeredQuestion = null;

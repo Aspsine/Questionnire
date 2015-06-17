@@ -20,6 +20,7 @@ import com.fang.chinaindex.questionnaire.model.SurveyInfo;
 import com.fang.chinaindex.questionnaire.model.SurveyResults;
 import com.fang.chinaindex.questionnaire.model.UploadSampleResult;
 import com.fang.chinaindex.questionnaire.repository.NetRepository;
+import com.fang.chinaindex.questionnaire.ui.activity.SurveyActivity;
 import com.fang.chinaindex.questionnaire.util.DES;
 import com.fang.chinaindex.questionnaire.util.DateUtils;
 import com.fang.chinaindex.questionnaire.util.L;
@@ -197,7 +198,14 @@ public class NetRepositoryImpl implements NetRepository {
                 for (Question question : questions) {
                     List<Option> options = question.getOptions();
                     for (Option option : options) {
-                        SurveyAnswer surveyAnswer = new SurveyAnswer(question.getId(), option.getId(), option.getOpenAnswer(), answeredSurvey.getInfo().getStartTime(), option.getSort());
+                        String sort = null;
+                        //sort logic
+                        if (Integer.valueOf(question.getCategory()) == SurveyActivity.TYPE.SORT) {
+                            sort = option.getSort();
+                        } else {
+                            sort = String.valueOf(1);
+                        }
+                        SurveyAnswer surveyAnswer = new SurveyAnswer(question.getId(), option.getId(), option.getOpenAnswer(), answeredSurvey.getInfo().getStartTime(), sort);
                         surveyAnswers.add(surveyAnswer);
                     }
                 }

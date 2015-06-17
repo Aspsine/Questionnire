@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Created by aspsine on 15/5/12.
  */
-public class Option {
+public class Option implements Comparable<Option> {
     @SerializedName("iID")
     private String id;
     @SerializedName("sOptionTitle")
@@ -79,5 +79,10 @@ public class Option {
 
     public void setOpenAnswer(String openAnswer) {
         this.openAnswer = openAnswer;
+    }
+
+    @Override
+    public int compareTo(Option another) {
+        return Integer.valueOf(this.sort) - Integer.valueOf(another.sort);
     }
 }
