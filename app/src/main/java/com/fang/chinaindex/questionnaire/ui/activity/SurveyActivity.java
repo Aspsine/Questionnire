@@ -45,12 +45,6 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
     private String mSurveyId;
     /**
      * start time of the survey
-     * <br/>
-     * if (mStartTime.equals(START_TIME_NONE)){
-     * 回答新问卷
-     * }else{
-     * 继续回答旧问卷
-     * }
      */
     private String mStartTime;
 
@@ -102,7 +96,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         if (TextUtils.isEmpty(mStartTime)) {
             mStartTime = DateUtils.getCurrentDate();
         }
-        mStartTime = "test time";
+//        mStartTime = "test time";
 
         initTemplateSurvey();
         initAnsweredSurvey();
