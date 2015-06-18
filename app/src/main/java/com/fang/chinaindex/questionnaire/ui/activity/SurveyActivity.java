@@ -124,36 +124,23 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         }
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        String message = "Save into unfinished.";
-//
-//        Question currentQuestion = mTemplateQuestions.get(mCurrentPosition);
-//        List<Option> selectedOptions = getQuestionSelectedOptions(currentQuestion);
-//        // true answered;
-//        // false not answered;
-//        if(isLastQuestionInTemplate()){
-//            message = "Save into submit.";
-//        }else {
-//            boolean isCurrentQuestionBeenAnswered = !selectedOptions.isEmpty();
-//            if (isCurrentQuestionBeenAnswered) {
-//                Logic logic = getJumpLogic(currentQuestion.getLogics());
-//                if (logic != null) {
-//                    if (Integer.valueOf(logic.getLogicType()) == LOGIC_TYPE.FINISH_SURVEY){
-//                        message = "Save into submit.";
-//                    }
-//                }
-//            }else {
-//                if (Boolean.valueOf(currentQuestion.getIsMust())){
-//
-//                }else {
-//
-//                }
-//            }
-//        }
-//
-//        super.onBackPressed();
-//    }
+    @Override
+    public void onBackPressed() {
+        boolean finished = isFinishedSurvey();
+        saveSurvey(finished);
+
+        String message = finished ? "save to submit" : "save to unfinished";
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setMessage(message)
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        SurveyActivity.super.onBackPressed();
+                    }
+                }).create();
+        dialog.show();
+    }
 
     private void initTemplateSurvey() {
         mTemplateSurvey = App.getCacheRepository().getSurvey(mSurveyId);
@@ -693,45 +680,43 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         }
     }
 
-//    private void buildQuestionWithAnswer(Question question) {
-//        Question answeredQuestion = null;
-//        for (Question a : mAnsweredQuestions) {
-//            if (question.getId().equals(a.getId())) {
-//                answeredQuestion = a;
-//                break;
-//            }
-//        }
-//        if (answeredQuestion == null) {
-//            return;
-//        }
-//        List<Option> aOptions = answeredQuestion.getOptions();
-//        List<Option> options = question.getOptions();
-//        if (aOptions == null && aOptions.isEmpty()) {
-//            return;
-//        }
-//        if (Integer.valueOf(question.getCategory()) == TYPE.SORT) {
-//            for (Option ao : aOptions) {
-//                ao.setChecked(true);
-//                Iterator<Option> iterator = options.iterator();
-//                while (iterator.hasNext()) {
-//                    Option o = iterator.next();
-//                    if (o.getId().equals(ao.getId())) {
-//                        iterator.remove();
-//                        break;
-//                    }
-//                }
-//            }
-//            options.addAll(0, aOptions);
-//        } else {
-//            for (Option ao : aOptions) {
-//                for (Option o : options) {
-//                    if (ao.getId().equals(o.getId())) {
-//                        ao.setChecked(true);
-//                        o.setChecked(true);
-//                    }
-//                }
-//            }
-//        }
-//    }
+    /**
+     * 返回时判断当前问卷是否完成
+     * @return
+     */
+    private boolean isFinishedSurvey() {
+        boolean finished = false;
+        Question currentQuestion = mTemplateQuestions.get(mCurrentPosition);
+        //true answered, false not answered;
+        boolean isCurrentQuestionBeenAnswered = !getQuestionSelectedOptions(currentQuestion).isEmpty();
+        if (isCurrentQuestionBeenAnswered) {
+            saveQuestion(currentQuestion, false, true);
+            Logic logic = getJumpLogic(currentQuestion.getLogics());
+            if (logic == null) {
+                //非逻辑跳转
+                if (isLastQuestionInTemplate()) {
+                    finished = true;
+                }
+            } else {
+                //逻辑跳转
+                if (Integer.valueOf(logic.getLogicType()) == LOGIC_TYPE.FINISH_SURVEY) {
+                    finished = true;
+                } else {
+                    if (isLastQuestionInTemplate()) {
+                        finished = true;
+                    }
+                }
+            }
+        } else {
+            if (isLastQuestionInTemplate()) {
+                //isMust 反的
+                if (Boolean.valueOf(currentQuestion.getIsMust())) {
+                    saveQuestion(currentQuestion, false, true);
+                    finished = true;
+                }
+            }
+        }
+        return finished;
+    }
 
 }
