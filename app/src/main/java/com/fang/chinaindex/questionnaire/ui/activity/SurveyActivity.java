@@ -96,7 +96,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         if (TextUtils.isEmpty(mStartTime)) {
             mStartTime = DateUtils.getCurrentDate();
         }
-//        mStartTime = "test time";
+        mStartTime = "test time";
 
         initTemplateSurvey();
         initAnsweredSurvey();
@@ -667,6 +667,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
             for (Option answeredOption : answeredOptions) {
                 if (answeredOption.getId().equals(templateOption.getId())) {
                     templateOption.setChecked(true);
+                    templateOption.setOpenAnswer(answeredOption.getOpenAnswer());
                     L.i(TAG, "buildTemplateWithAnsweredQuestions = " + templateOption.getOptionTitle());
                     break;
                 }
@@ -676,6 +677,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
 
     /**
      * 返回时判断当前问卷是否完成
+     *
      * @return
      */
     private boolean isFinishedSurvey() {

@@ -70,7 +70,7 @@ public class AnsweredSurveyInfoDao extends AbstractDao<SurveyInfo> {
         try {
             cursor.moveToFirst();
             surveyInfo.setSurveyId(cursor.getString(cursor.getColumnIndex("surveyId")));
-            surveyInfo.setFinished(Boolean.valueOf(cursor.getString(cursor.getColumnIndex("finished"))));
+            surveyInfo.setFinished(cursor.getInt(cursor.getColumnIndex("finished")) == 1);
             surveyInfo.setTitle(cursor.getString(cursor.getColumnIndex("title")));
             surveyInfo.setUpdateTime(cursor.getString(cursor.getColumnIndex("updateTime")));
             surveyInfo.setCollectionEndTime(cursor.getString(cursor.getColumnIndex("collectionEndTime")));

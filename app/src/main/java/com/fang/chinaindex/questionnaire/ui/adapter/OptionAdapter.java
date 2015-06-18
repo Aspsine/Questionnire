@@ -13,7 +13,9 @@ import android.widget.TextView;
 
 import com.fang.chinaindex.questionnaire.R;
 import com.fang.chinaindex.questionnaire.model.Option;
+import com.fang.chinaindex.questionnaire.model.Question;
 import com.fang.chinaindex.questionnaire.ui.widget.CheckableLinearLayout;
+import com.fang.chinaindex.questionnaire.util.L;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +59,7 @@ public class OptionAdapter extends RecyclerViewAdapter {
                 holder = new OptionTextViewHolder(inflate(parent, R.layout.item_option_text), mListener);
                 break;
             case TYPE.OPEN:
-                holder = new OpenOptionViewHolder(inflate(parent, R.layout.item_option_editext));
+                holder = new OpenOptionViewHolder(inflate(parent, R.layout.item_option_editext), mListener);
                 break;
             default:
                 throw new IllegalArgumentException("wrong type");
@@ -121,7 +123,7 @@ public class OptionAdapter extends RecyclerViewAdapter {
      *
      * @param position
      */
-    private void unCheckAllExceptPosition(int position) {
+    public void unCheckAllExceptPosition(int position) {
         Option option = null;
         for (int i = 0, size = mOptions.size(); i < size; i++) {
             if (i != position) {
@@ -139,9 +141,11 @@ public class OptionAdapter extends RecyclerViewAdapter {
         TextView tvOpen;
         EditText etOpen;
         private Option mOption;
+        private OnItemClickListener<Option> mmListener;
 
-        public OpenOptionViewHolder(View itemView) {
+        public OpenOptionViewHolder(View itemView, OnItemClickListener listener) {
             super(itemView);
+            this.mmListener = listener;
             cllOpen = (CheckableLinearLayout) itemView.findViewById(R.id.llOpen);
             tvOpen = (TextView) itemView.findViewById(R.id.tvOpen);
             etOpen = (EditText) itemView.findViewById(R.id.etOpen);
@@ -170,7 +174,13 @@ public class OptionAdapter extends RecyclerViewAdapter {
 
         @Override
         public void afterTextChanged(Editable s) {
-            mOption.setChecked(!TextUtils.isEmpty(s));
+            boolean isEmpty = TextUtils.isEmpty(s);
+            if (mOption.isChecked() == isEmpty) {
+                mOption.setChecked(!isEmpty);
+                if (mOption.isChecked() && mmListener != null) {
+                    mmListener.onItemClick(getLayoutPosition(), mOption, cllOpen);
+                }
+            }
             mOption.setOpenAnswer(String.valueOf(s));
             cllOpen.setChecked(mOption.isChecked());
         }
@@ -199,7 +209,7 @@ public class OptionAdapter extends RecyclerViewAdapter {
         @Override
         public void onClick(View v) {
             if (mmListener != null) {
-                mmListener.onItemClick(getPosition(), mOption, v);
+                mmListener.onItemClick(getLayoutPosition(), mOption, v);
             }
         }
     }

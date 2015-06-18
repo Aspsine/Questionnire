@@ -69,8 +69,8 @@ public class AnsweredOptionDao extends AbstractDao<Option> {
                 option.setId(cursor.getString(cursor.getColumnIndex("optionId")));
                 option.setOptionTitle(cursor.getString(cursor.getColumnIndex("optionTitle")));
                 option.setSort(cursor.getString(cursor.getColumnIndex("sort")));
-                option.setIsOther(Boolean.valueOf(cursor.getString(cursor.getColumnIndex("isOther"))));
-                option.setChecked(Boolean.valueOf(cursor.getString(cursor.getColumnIndex("checked"))));
+                option.setIsOther(cursor.getInt(cursor.getColumnIndex("isOther")) == 1);
+                option.setChecked(cursor.getInt(cursor.getColumnIndex("checked")) == 1);
                 option.setOpenAnswer(cursor.getString(cursor.getColumnIndex("openAnswer")));
                 options.add(option);
             }

@@ -83,7 +83,7 @@ public class OptionDao extends AbstractDao<Option> {
                 option.setId(cursor.getString(cursor.getColumnIndex("optionId")));
                 option.setOptionTitle(cursor.getString(cursor.getColumnIndex("optionTitle")));
                 option.setSort(cursor.getString(cursor.getColumnIndex("sort")));
-                option.setIsOther(Boolean.valueOf(cursor.getString(cursor.getColumnIndex("isOther"))));
+                option.setIsOther(cursor.getInt(cursor.getColumnIndex("isOther")) == 1);
                 options.add(option);
             }
         } finally {
