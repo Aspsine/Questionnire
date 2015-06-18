@@ -9,6 +9,9 @@ public class MultiChoiceFragment extends SingleMultiOpenBaseFragment {
 
     @Override
     public void onItemClick(int position, Option option, View v) {
-        mAdapter.toggle(position);
+        if (!option.isOther()) {
+            //not open option
+            mAdapter.toggle(position);
+        }
     }
 }
