@@ -83,20 +83,23 @@ public class AnsweredSurveyInfoDao extends AbstractDao<SurveyInfo> {
         return surveyInfo;
     }
 
-    public List<SurveyInfo> getAnsweredSurveyInfos(String userId) {
+    public List<SurveyInfo> getAnsweredSurveyInfos(String userId, boolean finished) {
         List<SurveyInfo> surveyInfos = new ArrayList<SurveyInfo>();
-        Cursor cursor = db.rawQuery("Select * from " + TABLE_NAME + " where userId=?", new String[]{userId});
+        Cursor cursor = db.rawQuery("Select * from " + TABLE_NAME + " where userId=? and finished = ?", new String[]{userId, finished ? "1" : "0"});
         try {
-            cursor.moveToFirst();
-            SurveyInfo surveyInfo = new SurveyInfo();
-            surveyInfo.setSurveyId(cursor.getString(cursor.getColumnIndex("surveyId")));
-            surveyInfo.setTitle(cursor.getString(cursor.getColumnIndex("title")));
-            surveyInfo.setUpdateTime(cursor.getString(cursor.getColumnIndex("updateTime")));
-            surveyInfo.setCollectionEndTime(cursor.getString(cursor.getColumnIndex("collectionEndTime")));
-            surveyInfo.setTypeId(cursor.getString(cursor.getColumnIndex("typeId")));
-            surveyInfo.setTypeName(cursor.getString(cursor.getColumnIndex("typeName")));
-            surveyInfo.setCompanyName(cursor.getString(cursor.getColumnIndex("companyName")));
-            surveyInfos.add(surveyInfo);
+            while (cursor.moveToNext()){
+                SurveyInfo surveyInfo = new SurveyInfo();
+                surveyInfo.setSurveyId(cursor.getString(cursor.getColumnIndex("surveyId")));
+                surveyInfo.setTitle(cursor.getString(cursor.getColumnIndex("title")));
+                surveyInfo.setUpdateTime(cursor.getString(cursor.getColumnIndex("updateTime")));
+                surveyInfo.setCollectionEndTime(cursor.getString(cursor.getColumnIndex("collectionEndTime")));
+                surveyInfo.setTypeId(cursor.getString(cursor.getColumnIndex("typeId")));
+                surveyInfo.setTypeName(cursor.getString(cursor.getColumnIndex("typeName")));
+                surveyInfo.setCompanyName(cursor.getString(cursor.getColumnIndex("companyName")));
+                surveyInfo.setStartTime(cursor.getString(cursor.getColumnIndex("startTime")));
+                surveyInfo.setEndTime(cursor.getString(cursor.getColumnIndex("endTime")));
+                surveyInfos.add(surveyInfo);
+            }
         } finally {
             cursor.close();
         }

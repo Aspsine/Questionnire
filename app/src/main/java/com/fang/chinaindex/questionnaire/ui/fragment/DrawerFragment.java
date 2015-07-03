@@ -133,7 +133,7 @@ public class DrawerFragment extends Fragment implements DrawerAdapter.OnItemClic
     }
 
     @Override
-    public void onItemClick(int position, Section section, View v) {
+    public void onItemClick(View v, int position, Section section) {
         if (position == mCurrentSelectedPosition) {
             L.i("position == mCurrentSelectedPosition");
             closeDrawer();

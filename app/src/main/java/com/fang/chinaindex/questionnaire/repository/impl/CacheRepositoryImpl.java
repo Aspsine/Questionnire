@@ -17,6 +17,7 @@ import com.fang.chinaindex.questionnaire.model.Question;
 import com.fang.chinaindex.questionnaire.model.Survey;
 import com.fang.chinaindex.questionnaire.model.SurveyInfo;
 import com.fang.chinaindex.questionnaire.model.UserInfo;
+import com.fang.chinaindex.questionnaire.model.UserSurveyInfo;
 import com.fang.chinaindex.questionnaire.repository.CacheRepository;
 
 import java.util.ArrayList;
@@ -62,6 +63,20 @@ public class CacheRepositoryImpl implements CacheRepository {
         try {
             List<String> surveyIds = userSurveyInfoDao.getSurveyIdsByUserId(userId);
             surveyInfos = surveyInfoDao.getSurveyInfos(surveyIds);
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+        return surveyInfos;
+    }
+
+    @Override
+    public List<SurveyInfo> getAnsweredSurveyInfos(String userId, boolean finished) {
+        AnsweredSurveyInfoDao answeredSurveyInfoDao = daoSession.getAnsweredSurveyInfoDao();
+        List<SurveyInfo> surveyInfos = null;
+        db.beginTransaction();
+        try {
+            surveyInfos = answeredSurveyInfoDao.getAnsweredSurveyInfos(userId, finished);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();

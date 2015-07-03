@@ -36,6 +36,8 @@ public class SurveyInfo {
      */
     private boolean finished;
 
+    private boolean selected;
+
     public String getSurveyId() {
         return surveyId;
     }
@@ -114,5 +116,13 @@ public class SurveyInfo {
 
     public boolean isFinished() {
         return finished;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 }

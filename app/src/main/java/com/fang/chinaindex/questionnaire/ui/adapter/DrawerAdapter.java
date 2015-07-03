@@ -92,7 +92,7 @@ public class DrawerAdapter extends RecyclerViewAdapter {
 
         @Override
         public void onClick(View v) {
-            mmListener.onItemClick(getLayoutPosition(), mSection, v);
+            mmListener.onItemClick(v, getLayoutPosition(), mSection);
         }
     }
 }

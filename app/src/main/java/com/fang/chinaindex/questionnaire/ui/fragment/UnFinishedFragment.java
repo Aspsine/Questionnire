@@ -2,20 +2,35 @@ package com.fang.chinaindex.questionnaire.ui.fragment;
 
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 
+import com.fang.chinaindex.questionnaire.App;
 import com.fang.chinaindex.questionnaire.R;
+import com.fang.chinaindex.questionnaire.model.SurveyInfo;
+import com.fang.chinaindex.questionnaire.ui.activity.SurveyActivity;
+import com.fang.chinaindex.questionnaire.ui.adapter.RecyclerViewAdapter;
+import com.fang.chinaindex.questionnaire.ui.adapter.UnfinishedAdapter;
 import com.fang.chinaindex.questionnaire.util.L;
+import com.fang.chinaindex.questionnaire.util.SharedPrefUtils;
+
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class UnFinishedFragment extends Fragment {
+public class UnFinishedFragment extends Fragment implements RecyclerViewAdapter.OnItemClickListener<SurveyInfo>, RecyclerViewAdapter.OnItemLongClickListener<SurveyInfo> {
     public static final String TAG = UnFinishedFragment.class.getSimpleName();
+    private UnfinishedAdapter mAdapter;
+    private boolean mEditMode;
 
     public UnFinishedFragment() {
         // Required empty public constructor
@@ -24,74 +39,70 @@ public class UnFinishedFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        L.e(TAG,"onCreate");
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        L.e(TAG, "onCreate");
+        mAdapter = new UnfinishedAdapter();
+        mAdapter.setOnItemClickListener(this);
+        mAdapter.setOnItemLongClickListener(this);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        L.e(TAG, "onCreateView");
         return inflater.inflate(R.layout.fragment_un_finished, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        L.e(TAG, "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setAdapter(mAdapter);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        L.e(TAG, "onActivityCreated");
         super.onActivityCreated(savedInstanceState);
+        refresh();
     }
 
     @Override
-    public void onStart() {
-        L.e(TAG, "onStart");
-        super.onStart();
+    public void onItemClick(View v, int position, SurveyInfo surveyInfo) {
+        if (mEditMode) {
+            surveyInfo.setSelected(!surveyInfo.isSelected());
+            mAdapter.notifyItemChanged(position);
+        } else {
+            Intent intent = new Intent(getActivity(), SurveyActivity.class);
+            intent.putExtra("EXTRA_SURVEY_ID", String.valueOf(surveyInfo.getSurveyId()));
+            intent.putExtra("EXTRA_SURVEY_START_TIME", surveyInfo.getStartTime());
+            v.getContext().startActivity(intent);
+        }
     }
 
     @Override
-    public void onResume() {
-        L.e(TAG, "onResume");
-        super.onResume();
+    public boolean onItemLongClick(View v, int position, SurveyInfo surveyInfo) {
+        if (!mEditMode) {
+            mEditMode = true;
+            showEditModeToolBar();
+            mAdapter.setEditMode(true);
+            onItemClick(v, position, surveyInfo);
+            return false;
+        }
+        return true;
     }
 
-    @Override
-    public void onPause() {
-        L.e(TAG, "onPause");
-        super.onPause();
+    private void showEditModeToolBar() {
+
     }
 
-    @Override
-    public void onStop() {
-        L.e(TAG, "onStop");
-        super.onStop();
+    private void refresh() {
+        List<SurveyInfo> surveyInfos = App.getCacheRepository().getAnsweredSurveyInfos(SharedPrefUtils.getUserId(getActivity()), false);
+        mAdapter.setData(surveyInfos);
     }
 
-    @Override
-    public void onDestroy() {
-        L.e(TAG, "onDestroy");
-        super.onDestroy();
-    }
 
-    @Override
-    public void onDestroyView() {
-        L.e(TAG, "onDestroyView");
-        super.onDestroyView();
-    }
-
-    @Override
-    public void onDetach() {
-        L.e(TAG, "onDetach");
-        super.onDetach();
-    }
 }

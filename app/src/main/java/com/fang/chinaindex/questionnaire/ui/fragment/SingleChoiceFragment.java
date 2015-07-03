@@ -13,7 +13,7 @@ import com.fang.chinaindex.questionnaire.ui.activity.SurveyActivity;
 public class SingleChoiceFragment extends SingleMultiOpenBaseFragment {
 
     @Override
-    public void onItemClick(int position, Option option, View v) {
+    public void onItemClick(View v, int position, Option option) {
         if (option.isOther()) {
             //open option
             mAdapter.unCheckAllExceptPosition(position);

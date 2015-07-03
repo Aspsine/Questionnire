@@ -178,7 +178,7 @@ public class OptionAdapter extends RecyclerViewAdapter {
             if (mOption.isChecked() == isEmpty) {
                 mOption.setChecked(!isEmpty);
                 if (mOption.isChecked() && mmListener != null) {
-                    mmListener.onItemClick(getLayoutPosition(), mOption, cllOpen);
+                    mmListener.onItemClick(cllOpen, getLayoutPosition(), mOption);
                 }
             }
             mOption.setOpenAnswer(String.valueOf(s));
@@ -209,7 +209,7 @@ public class OptionAdapter extends RecyclerViewAdapter {
         @Override
         public void onClick(View v) {
             if (mmListener != null) {
-                mmListener.onItemClick(getLayoutPosition(), mOption, v);
+                mmListener.onItemClick(v, getLayoutPosition(), mOption);
             }
         }
     }

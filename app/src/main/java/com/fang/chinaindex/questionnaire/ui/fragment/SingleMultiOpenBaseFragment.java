@@ -51,7 +51,7 @@ public class SingleMultiOpenBaseFragment extends QuestionBaseFragment implements
     }
 
     @Override
-    public void onItemClick(int position, Option option, View v) {
+    public void onItemClick(View v, int position, Option option) {
     }
 
 

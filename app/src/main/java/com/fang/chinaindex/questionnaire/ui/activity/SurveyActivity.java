@@ -94,9 +94,10 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         String tmpStartTime = mStartTime;
 
         if (TextUtils.isEmpty(mStartTime)) {
+            L.i(TAG, "startTime = now");
             mStartTime = DateUtils.getCurrentDate();
         }
-        mStartTime = "test time";
+//        mStartTime = "test time";
 
         initTemplateSurvey();
         initAnsweredSurvey();
