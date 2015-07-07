@@ -3,9 +3,11 @@ package com.fang.chinaindex.questionnaire.ui.fragment;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
@@ -35,6 +37,7 @@ public class UnFinishedFragment extends Fragment implements RecyclerViewAdapter.
 
     private ActionMode mActionMode;
 
+    private String mUserId;
     private UnfinishedAdapter mAdapter;
     private boolean mEditMode;
 
@@ -51,6 +54,7 @@ public class UnFinishedFragment extends Fragment implements RecyclerViewAdapter.
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        mUserId = SharedPrefUtils.getUserId(getActivity());
         mAdapter = new UnfinishedAdapter();
         mAdapter.setOnItemClickListener(this);
         mAdapter.setOnItemLongClickListener(this);
@@ -75,6 +79,14 @@ public class UnFinishedFragment extends Fragment implements RecyclerViewAdapter.
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         refresh();
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (mEditMode && mActionMode != null) {
+            toggleEditMode(false);
+        }
+        super.onDestroyView();
     }
 
     @Override
@@ -127,6 +139,10 @@ public class UnFinishedFragment extends Fragment implements RecyclerViewAdapter.
         } else {
             // clear all selection of the recyclerView
             mAdapter.clearAllSelection();
+            // finish actionMode toolBar
+            if (mActionMode != null) {
+                mActionMode.finish();
+            }
         }
     }
 
@@ -135,21 +151,22 @@ public class UnFinishedFragment extends Fragment implements RecyclerViewAdapter.
         mAdapter.notifyItemChanged(position);
     }
 
-    void updateActionModeTitle(ActionMode mode, int selectedCount) {
-        mode.setTitle("Selected:" + selectedCount);
+    private void updateActionModeTitle(ActionMode mode, int selectedCount) {
+        mode.setTitle(String.valueOf(selectedCount));
     }
 
     private void refresh() {
-        List<SurveyInfo> surveyInfos = App.getCacheRepository().getAnsweredSurveyInfos(SharedPrefUtils.getUserId(getActivity()), false);
+        List<SurveyInfo> surveyInfos = App.getCacheRepository().getAnsweredSurveyInfos(mUserId, false);
         mAdapter.setData(surveyInfos);
     }
 
     private ActionMode.Callback mActionModeCallBack = new ActionMode.Callback() {
+
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             updateActionModeTitle(mode, mAdapter.getSelectedCount());
             MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.menu_login, menu);
+            inflater.inflate(R.menu.menu_action_mode_unfinshed, menu);
             return true;
         }
 
@@ -160,10 +177,19 @@ public class UnFinishedFragment extends Fragment implements RecyclerViewAdapter.
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            if (item.getItemId() == R.id.action_settings) {
-                mAdapter.selectAll();
-                updateActionModeTitle(mode, mAdapter.getSelectedCount());
-                return true;
+            int id = item.getItemId();
+            switch (id) {
+                case R.id.action_select:
+                    if (mAdapter.isAllSelected()) {
+                        toggleEditMode(false);
+                    } else {
+                        mAdapter.selectAll();
+                        updateActionModeTitle(mode, mAdapter.getSelectedCount());
+                    }
+                    return true;
+                case R.id.action_delete:
+                    showDeleteDialog();
+                    return true;
             }
             return false;
         }
@@ -171,6 +197,28 @@ public class UnFinishedFragment extends Fragment implements RecyclerViewAdapter.
         @Override
         public void onDestroyActionMode(ActionMode mode) {
             toggleEditMode(false);
+        }
+
+        private void showDeleteDialog() {
+            AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                    .setTitle("Alert!")
+                    .setMessage("Delete Selected unfinished Surveys?")
+                    .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            List<SurveyInfo> surveyInfos = mAdapter.getSelectedSurveyInfos();
+                            App.getCacheRepository().deleteAnsweredSurveys(mUserId, surveyInfos);
+                            mAdapter.removeSelectedSurveys();
+                            toggleEditMode(false);
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    }).create();
+            dialog.show();
         }
     };
 

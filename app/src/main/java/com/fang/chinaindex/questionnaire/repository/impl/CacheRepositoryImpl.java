@@ -273,4 +273,22 @@ public class CacheRepositoryImpl implements CacheRepository {
         }
     }
 
+    @Override
+    public void deleteAnsweredSurveys(String userId, List<SurveyInfo> surveyInfos) {
+        AnsweredSurveyInfoDao answeredSurveyInfoDao = daoSession.getAnsweredSurveyInfoDao();
+        AnsweredQuestionDao answeredQuestionDao = daoSession.getAnsweredQuestionDao();
+        AnsweredOptionDao answeredOptionDao = daoSession.getAnsweredOptionDao();
+        db.beginTransaction();
+        try {
+            for (SurveyInfo info : surveyInfos) {
+                answeredSurveyInfoDao.delete(userId, info.getSurveyId(), info.getStartTime());
+                answeredQuestionDao.delete(userId, info.getSurveyId(), info.getStartTime());
+                answeredOptionDao.delete(userId, info.getSurveyId(), info.getStartTime());
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
 }

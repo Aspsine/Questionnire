@@ -17,6 +17,7 @@ import com.fang.chinaindex.questionnaire.ui.activity.SurveyActivity;
 import com.fang.chinaindex.questionnaire.util.UIUtils;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -43,7 +44,9 @@ public class UnfinishedAdapter extends RecyclerViewAdapter {
 
     public void setData(List<SurveyInfo> surveyInfos) {
         this.mSurveyInfos.clear();
-        mSurveyInfos.addAll(surveyInfos);
+        if (surveyInfos != null) {
+            mSurveyInfos.addAll(surveyInfos);
+        }
         notifyDataSetChanged();
     }
 
@@ -95,6 +98,27 @@ public class UnfinishedAdapter extends RecyclerViewAdapter {
         });
     }
 
+    public void removeSelectedSurveys() {
+        Iterator<SurveyInfo> iterator = mSurveyInfos.iterator();
+        while (iterator.hasNext()) {
+            SurveyInfo info = iterator.next();
+            if (info.isSelected()) {
+                iterator.remove();
+            }
+        }
+        notifyDataSetChanged();
+    }
+
+    public List<SurveyInfo> getSelectedSurveyInfos() {
+        List<SurveyInfo> surveyInfos = new ArrayList<>();
+        for (SurveyInfo info : mSurveyInfos) {
+            if (info.isSelected()) {
+                surveyInfos.add(info);
+            }
+        }
+        return surveyInfos;
+    }
+
     public void selectAll() {
         for (SurveyInfo info : mSurveyInfos) {
             info.setSelected(true);
@@ -110,6 +134,15 @@ public class UnfinishedAdapter extends RecyclerViewAdapter {
                 this.notifyItemChanged(i);
             }
         }
+    }
+
+    public boolean isAllSelected() {
+        for (SurveyInfo info : mSurveyInfos) {
+            if (!info.isSelected()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public int getSelectedCount() {

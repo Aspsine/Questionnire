@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import com.fang.chinaindex.questionnaire.App;
 import com.fang.chinaindex.questionnaire.R;
 import com.fang.chinaindex.questionnaire.model.SurveyInfo;
+import com.fang.chinaindex.questionnaire.ui.adapter.RecyclerViewAdapter;
 import com.fang.chinaindex.questionnaire.ui.adapter.UnfinishedAdapter;
 import com.fang.chinaindex.questionnaire.util.SharedPrefUtils;
 
@@ -20,7 +21,7 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SubmitFragment extends Fragment {
+public class SubmitFragment extends Fragment implements RecyclerViewAdapter.OnItemClickListener<SurveyInfo>, RecyclerViewAdapter.OnItemLongClickListener<SurveyInfo>  {
     private UnfinishedAdapter mAdapter;
 
     private String mUserId;
@@ -57,8 +58,21 @@ public class SubmitFragment extends Fragment {
         refresh();
     }
 
+    @Override
+    public void onItemClick(View v, int position, SurveyInfo info) {
+
+    }
+
+    @Override
+    public boolean onItemLongClick(View v, int position, SurveyInfo info) {
+        return false;
+    }
+
     private void refresh() {
         List<SurveyInfo> surveyInfos = App.getCacheRepository().getAnsweredSurveyInfos(mUserId, true);
         mAdapter.setData(surveyInfos);
     }
+
+
+
 }

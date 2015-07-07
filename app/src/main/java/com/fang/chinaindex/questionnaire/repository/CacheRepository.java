@@ -37,4 +37,7 @@ public interface CacheRepository {
     public void saveAnsweredSurvey(String userId, SurveyInfo surveyInfo);
 
     public void deleteAnsweredSurvey(String userId, String surveyId, String startTime);
+
+    public void deleteAnsweredSurveys(String userId, List<SurveyInfo> surveyInfos);
+
 }
