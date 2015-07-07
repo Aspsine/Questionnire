@@ -2,13 +2,14 @@ package com.fang.chinaindex.questionnaire.ui.fragment;
 
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.ActionMode;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,6 +20,7 @@ import android.view.ViewGroup;
 import com.fang.chinaindex.questionnaire.App;
 import com.fang.chinaindex.questionnaire.R;
 import com.fang.chinaindex.questionnaire.model.SurveyInfo;
+import com.fang.chinaindex.questionnaire.ui.activity.SurveyActivity;
 import com.fang.chinaindex.questionnaire.ui.adapter.RecyclerViewAdapter;
 import com.fang.chinaindex.questionnaire.ui.adapter.UnfinishedAdapter;
 import com.fang.chinaindex.questionnaire.util.SharedPrefUtils;
@@ -30,6 +32,9 @@ import java.util.List;
  */
 public class UnFinishedFragment extends Fragment implements RecyclerViewAdapter.OnItemClickListener<SurveyInfo>, RecyclerViewAdapter.OnItemLongClickListener<SurveyInfo> {
     public static final String TAG = UnFinishedFragment.class.getSimpleName();
+
+    private ActionMode mActionMode;
+
     private UnfinishedAdapter mAdapter;
     private boolean mEditMode;
 
@@ -67,51 +72,82 @@ public class UnFinishedFragment extends Fragment implements RecyclerViewAdapter.
     }
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater inflater = getActivity().getMenuInflater();
-        inflater.inflate(R.menu.menu_login, menu);
-    }
-
-    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         refresh();
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        return super.onContextItemSelected(item);
-
-    }
-
-    @Override
     public void onItemClick(View v, int position, SurveyInfo surveyInfo) {
-//        if (mEditMode) {
-//            surveyInfo.setSelected(!surveyInfo.isSelected());
-//            mAdapter.notifyItemChanged(position);
-//        } else {
-//            Intent intent = new Intent(getActivity(), SurveyActivity.class);
-//            intent.putExtra("EXTRA_SURVEY_ID", String.valueOf(surveyInfo.getSurveyId()));
-//            intent.putExtra("EXTRA_SURVEY_START_TIME", surveyInfo.getStartTime());
-//            v.getContext().startActivity(intent);
-//        }
-        showEditModeToolBar();
+        if (mEditMode) {
+            onEditModeListItemClick(position, surveyInfo);
+        } else {
+            intentToSurveyActivity(v.getContext(), surveyInfo);
+        }
     }
 
     @Override
     public boolean onItemLongClick(View v, int position, SurveyInfo surveyInfo) {
-//        if (!mEditMode) {
-//            showEditModeToolBar();
-//            return false;
-//        }
+        if (!mEditMode) {
+            toggleEditMode(true);
+            toggleItemSelection(position, surveyInfo);
+            updateActionModeTitle(mActionMode, mAdapter.getSelectedCount());
+            return true;
+        }
         return true;
     }
 
+    private void onEditModeListItemClick(int position, SurveyInfo surveyInfo) {
+        toggleItemSelection(position, surveyInfo);
+        int selectedCount = mAdapter.getSelectedCount();
+        if (selectedCount == 0) {
+            mActionMode.finish();
+        } else {
+            updateActionModeTitle(mActionMode, selectedCount);
+        }
+    }
+
+    private void intentToSurveyActivity(Context context, SurveyInfo info) {
+        Intent intent = new Intent(getActivity(), SurveyActivity.class);
+        intent.putExtra("EXTRA_SURVEY_ID", String.valueOf(info.getSurveyId()));
+        intent.putExtra("EXTRA_SURVEY_START_TIME", info.getStartTime());
+        context.startActivity(intent);
+    }
+
+    /**
+     * toggle actionbar editMode
+     *
+     * @param editMode
+     */
+    private void toggleEditMode(boolean editMode) {
+        mEditMode = editMode;
+        if (mEditMode) {
+            // show actionMode toolbar
+            mActionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(mActionModeCallBack);
+        } else {
+            // clear all selection of the recyclerView
+            mAdapter.clearAllSelection();
+        }
+    }
+
+    private void toggleItemSelection(int position, SurveyInfo info) {
+        info.setSelected(!info.isSelected());
+        mAdapter.notifyItemChanged(position);
+    }
+
+    void updateActionModeTitle(ActionMode mode, int selectedCount) {
+        mode.setTitle("Selected:" + selectedCount);
+    }
+
+    private void refresh() {
+        List<SurveyInfo> surveyInfos = App.getCacheRepository().getAnsweredSurveyInfos(SharedPrefUtils.getUserId(getActivity()), false);
+        mAdapter.setData(surveyInfos);
+    }
 
     private ActionMode.Callback mActionModeCallBack = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            updateActionModeTitle(mode, mAdapter.getSelectedCount());
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.menu_login, menu);
             return true;
@@ -125,7 +161,8 @@ public class UnFinishedFragment extends Fragment implements RecyclerViewAdapter.
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             if (item.getItemId() == R.id.action_settings) {
-                mode.finish();
+                mAdapter.selectAll();
+                updateActionModeTitle(mode, mAdapter.getSelectedCount());
                 return true;
             }
             return false;
@@ -133,19 +170,8 @@ public class UnFinishedFragment extends Fragment implements RecyclerViewAdapter.
 
         @Override
         public void onDestroyActionMode(ActionMode mode) {
-
+            toggleEditMode(false);
         }
     };
-
-
-    private void showEditModeToolBar() {
-        getActivity().startActionMode(mActionModeCallBack);
-    }
-
-    private void refresh() {
-        List<SurveyInfo> surveyInfos = App.getCacheRepository().getAnsweredSurveyInfos(SharedPrefUtils.getUserId(getActivity()), false);
-        mAdapter.setData(surveyInfos);
-    }
-
 
 }

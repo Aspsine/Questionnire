@@ -25,8 +25,6 @@ import java.util.List;
 public class UnfinishedAdapter extends RecyclerViewAdapter {
     private List<SurveyInfo> mSurveyInfos;
 
-    private boolean mEditMode = false;
-
     private OnItemClickListener mOnItemClickListener;
 
     private OnItemLongClickListener mOnItemLongClickListener;
@@ -47,10 +45,6 @@ public class UnfinishedAdapter extends RecyclerViewAdapter {
         this.mSurveyInfos.clear();
         mSurveyInfos.addAll(surveyInfos);
         notifyDataSetChanged();
-    }
-
-    public void setEditMode(boolean editMode) {
-        this.mEditMode = editMode;
     }
 
     @Override
@@ -99,6 +93,33 @@ public class UnfinishedAdapter extends RecyclerViewAdapter {
                 return true;
             }
         });
+    }
+
+    public void selectAll() {
+        for (SurveyInfo info : mSurveyInfos) {
+            info.setSelected(true);
+        }
+        this.notifyDataSetChanged();
+    }
+
+    public void clearAllSelection() {
+        for (int i = 0, size = mSurveyInfos.size(); i < size; i++) {
+            SurveyInfo info = mSurveyInfos.get(i);
+            if (info.isSelected()) {
+                info.setSelected(false);
+                this.notifyItemChanged(i);
+            }
+        }
+    }
+
+    public int getSelectedCount() {
+        int selectedCount = 0;
+        for (SurveyInfo info : mSurveyInfos) {
+            if (info.isSelected()) {
+                selectedCount++;
+            }
+        }
+        return selectedCount;
     }
 
     public static class SurveyInfoViewHolder extends RecyclerView.ViewHolder {

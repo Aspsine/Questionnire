@@ -48,7 +48,10 @@ public abstract class BaseActivity extends AppCompatActivity {
             onBackPressed();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
+    }
+
+    public Toolbar getToolbar(){
+        return this.toolbar;
     }
 }

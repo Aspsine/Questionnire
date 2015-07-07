@@ -9,6 +9,7 @@
         <item name="colorAccent">@color/style_color_accent</item>
         <item name="android:windowBackground">@color/style_window_background</item>
         <item name="android:divider">@color/style_divider</item>
+        <item name="windowActionModeOverlay">true</item>
     </style>
 
 
