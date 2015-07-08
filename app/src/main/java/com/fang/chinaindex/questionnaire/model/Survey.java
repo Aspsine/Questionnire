@@ -9,6 +9,14 @@ public class Survey {
     private SurveyInfo info;
     private List<Question> questions;
 
+    public Survey() {
+    }
+
+    public Survey(SurveyInfo info, List<Question> questions) {
+        this.info = info;
+        this.questions = questions;
+    }
+
     public SurveyInfo getInfo() {
         return info;
     }

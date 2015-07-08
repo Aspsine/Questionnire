@@ -155,6 +155,17 @@ public class UnfinishedAdapter extends RecyclerViewAdapter {
         return selectedCount;
     }
 
+    public void remove(SurveyInfo surveyInfo) {
+        for (int i = 0, size = mSurveyInfos.size(); i < size; i++) {
+            SurveyInfo info = mSurveyInfos.get(i);
+            if (info.getSurveyId().equals(surveyInfo.getSurveyId()) && info.getStartTime().equals(info.getStartTime())) {
+                mSurveyInfos.remove(i);
+                this.notifyItemRemoved(i);
+                break;
+            }
+        }
+    }
+
     public static class SurveyInfoViewHolder extends RecyclerView.ViewHolder {
         CardView cardView;
         TextView tvTitle;

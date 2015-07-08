@@ -133,7 +133,7 @@ public class MainActivity extends BaseActivity implements DrawerFragment.Navigat
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_logout) {
             startActivity(new Intent(this, LoginActivity.class));
             SharedPrefUtils.clearUserInfo(this);
             finish();
