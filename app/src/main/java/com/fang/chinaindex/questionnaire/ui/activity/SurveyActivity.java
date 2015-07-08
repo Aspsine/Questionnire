@@ -32,9 +32,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * TODO 排序题
- */
 public class SurveyActivity extends BaseActivity implements View.OnClickListener {
     private static final String TAG = SurveyActivity.class.getSimpleName();
     public static final String START_TIME_NONE = "start_time_none";
@@ -152,9 +149,9 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
     }
 
     /**
-     * TODO 1: 从数据库中取出已答题目list，适配模板问卷list，将模板问卷恢复上一次答题的状态
-     * TODO 2: 得到mCurrentPosition 并 利用适配好的模板问卷list 来生成 mAnsweredQuestionPositions
-     * TODO 3: 适配模版问卷
+     * 1: 从数据库中取出已答题目list，适配模板问卷list，将模板问卷恢复上一次答题的状态
+     * 2: 得到mCurrentPosition 并 利用适配好的模板问卷list 来生成 mAnsweredQuestionPositions
+     * 3: 适配模版问卷
      */
     private void initQuestion(List<Question> answeredQuestions) {
         if (answeredQuestions.isEmpty()) {
@@ -286,7 +283,6 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
      * @param currentQuestion
      */
     private void handlerAnsweredQuestion(final Question currentQuestion) {
-        //TODO 保存问题
         L.i("handlerAnsweredQuestion:" + currentQuestion.getQuestionTitle());
         saveQuestion(currentQuestion, true, true);
 
@@ -563,7 +559,6 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
             }
         }
 
-        //TODO save to db
         if (saveToDB) {
             //if current question is sort question, sort before save to db;
             List<Option> options = currentQuestion.getOptions();
