@@ -14,6 +14,8 @@ public class BaseFragment extends Fragment {
         Activity activity = getActivity();
         if (pDialog == null && activity != null && !activity.isFinishing()) {
             pDialog = new ProgressDialog(getActivity());
+            pDialog.setCancelable(false);
+            pDialog.setCanceledOnTouchOutside(false);
             pDialog.setMessage(msg);
         }
         pDialog.show();
