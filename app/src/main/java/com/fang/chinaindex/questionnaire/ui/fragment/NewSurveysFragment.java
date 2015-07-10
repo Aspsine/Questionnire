@@ -61,6 +61,7 @@ public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayo
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(mAdapter);
 
+        swipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.style_color_primary), getResources().getColor(R.color.style_color_primary_dark), getResources().getColor(R.color.style_color_primary_light));
         swipeRefreshLayout.setOnRefreshListener(this);
     }
 
@@ -120,6 +121,7 @@ public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayo
             if (surveyHas) {
                 boolean linkedHas = userLinkedSurveyIds.contains(surveyInfo.getSurveyId());
                 if (!linkedHas) {
+                    L.i(TAG, "link :" + surveyInfo.getTitle());
                     App.getCacheRepository().linkUserAndSurveyInfo(mUserId, surveyInfo.getSurveyId());
                 }
             } else {
