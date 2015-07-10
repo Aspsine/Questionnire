@@ -32,17 +32,10 @@ public class UserSurveyInfoDao extends AbstractDao<UserSurveyInfoDao> {
         super(db);
     }
 
-    public void save(String userId, SurveyInfo surveyInfo) {
-        if (!exist(userId, surveyInfo.getSurveyId())) {
-            insert(userId, surveyInfo);
+    public void save(String userId, String surveyId) {
+        if (!exist(userId, surveyId)) {
+            insert(userId, surveyId);
         }
-    }
-
-    public void save(String userId, List<SurveyInfo> surveyInfos) {
-        if (existByUserId(userId)) {
-            deleteByUserId(userId);
-        }
-        insert(userId, surveyInfos);
     }
 
     public void insert(String userId, List<SurveyInfo> surveyInfos) {
@@ -53,8 +46,8 @@ public class UserSurveyInfoDao extends AbstractDao<UserSurveyInfoDao> {
         }
     }
 
-    public void insert(String userId, SurveyInfo surveyInfo) {
-        db.insert(TABLE_NAME, null, getContentValues(userId, surveyInfo.getSurveyId(), null, false));
+    public void insert(String userId, String surveyId) {
+        db.insert(TABLE_NAME, null, getContentValues(userId, surveyId, null, false));
     }
 
 

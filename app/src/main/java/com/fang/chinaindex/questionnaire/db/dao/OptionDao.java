@@ -38,7 +38,7 @@ public class OptionDao extends AbstractDao<Option> {
     }
 
     public void save(String surveyId, String questionId, List<Option> options) {
-        updateIfFailsInsert(surveyId, questionId, options);
+        insert(surveyId, questionId, options);
     }
 
     public void updateIfFailsInsert(String surveyId, String questionId, List<Option> options) {
@@ -54,13 +54,14 @@ public class OptionDao extends AbstractDao<Option> {
         }
     }
 
-//    public void insert(String surveyId, String questionId, List<Option> options) {
-//        ContentValues contentValues = new ContentValues();
-//        for (Option option : options) {
-//            db.insert(TABLE_NAME, null, getContentValues(surveyId, questionId, option, contentValues, true));
-//            contentValues.clear();
-//        }
-//    }
+    public void insert(String surveyId, String questionId, List<Option> options) {
+        ContentValues contentValues = new ContentValues();
+        for (Option option : options) {
+            db.insert(TABLE_NAME, null, getContentValues(surveyId, questionId, option, contentValues, true));
+            contentValues.clear();
+        }
+    }
+
 //
 //    public void delete(String surveyId) {
 //        db.delete(TABLE_NAME, "surveyId = ?", new String[]{surveyId});

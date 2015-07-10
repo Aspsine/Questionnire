@@ -45,7 +45,7 @@ public class QuestionDao extends AbstractDao<Question> {
     }
 
     public void save(String surveyId, List<Question> questions) {
-        updateIfFailsInsert(surveyId, questions);
+        insert(surveyId, questions);
     }
 
     public void updateIfFailsInsert(String surveyId, List<Question> questions) {
@@ -59,13 +59,13 @@ public class QuestionDao extends AbstractDao<Question> {
         }
     }
 
-//    public void insert(String surveyId, List<Question> questions) {
-//        ContentValues contentValues = new ContentValues();
-//        for (Question question : questions) {
-//            db.insert(TABLE_NAME, null, getContentValue(surveyId, question, contentValues, true));
-//            contentValues.clear();
-//        }
-//    }
+    public void insert(String surveyId, List<Question> questions) {
+        ContentValues contentValues = new ContentValues();
+        for (Question question : questions) {
+            db.insert(TABLE_NAME, null, getContentValue(surveyId, question, contentValues, true));
+            contentValues.clear();
+        }
+    }
 //
 //    public void delete(String surveyId) {
 //        db.delete(TABLE_NAME, "surveyId = ?", new String[]{surveyId});

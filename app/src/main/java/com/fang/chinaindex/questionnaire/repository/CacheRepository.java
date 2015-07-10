@@ -14,19 +14,19 @@ public interface CacheRepository {
 
     public void saveUserInfo(UserInfo userInfo);
 
-    public void saveSurveyInfos(String userId, List<SurveyInfo> surveyInfos);
-
     public List<SurveyInfo> getSurveyInfos(String userId);
 
     public List<SurveyInfo> getAnsweredSurveyInfos(String userId, boolean finished);
 
+    public List<String> getSurveyIds();
+
     public List<String> getSurveyIds(String userId);
+
+    public void linkUserAndSurveyInfo(String userId, String surveyId);
 
     public void saveSurveys(String userId, List<Survey> surveys);
 
     public Survey getSurvey(String surveyId);
-
-    public List<Survey> getSurveys(String userId);
 
     public void saveAnsweredQuestion(String userId, String surveyId, String startTime, Question question);
 

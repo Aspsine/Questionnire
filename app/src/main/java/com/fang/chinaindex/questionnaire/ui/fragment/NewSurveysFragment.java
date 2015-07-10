@@ -104,17 +104,25 @@ public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayo
     private void getSurveys(List<SurveyInfo> surveyInfos) {
         show("Caching...");
 
-        List<String> cachedInfoIds = App.getCacheRepository().getSurveyIds(mUserId);
+        List<String> cachedSurveyIds = App.getCacheRepository().getSurveyIds();
+        List<String> userLinkedSurveyIds = App.getCacheRepository().getSurveyIds(mUserId);
         List<String> newSurveyIds = new ArrayList<>();
+
         for (SurveyInfo surveyInfo : surveyInfos) {
-            boolean has = false;
-            for (String cachedInfoId : cachedInfoIds) {
+            boolean surveyHas = false;
+            for (String cachedInfoId : cachedSurveyIds) {
                 if (surveyInfo.getSurveyId().equals(cachedInfoId)) {
-                    has = true;
+                    surveyHas = true;
                     break;
                 }
             }
-            if (!has) {
+
+            if (surveyHas) {
+                boolean linkedHas = userLinkedSurveyIds.contains(surveyInfo.getSurveyId());
+                if (!linkedHas) {
+                    App.getCacheRepository().linkUserAndSurveyInfo(mUserId, surveyInfo.getSurveyId());
+                }
+            } else {
                 newSurveyIds.add(surveyInfo.getSurveyId());
             }
         }

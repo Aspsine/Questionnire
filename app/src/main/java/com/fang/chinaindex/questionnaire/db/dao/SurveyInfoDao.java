@@ -39,7 +39,7 @@ public class SurveyInfoDao extends AbstractDao<SurveyInfo> {
         super(db);
     }
 
-    public void save(SurveyInfo surveyInfo){
+    public void save(SurveyInfo surveyInfo) {
         updateIfFailsInsert(surveyInfo);
     }
 
@@ -106,6 +106,20 @@ public class SurveyInfoDao extends AbstractDao<SurveyInfo> {
 //    private void update(SurveyInfo surveyInfo, String userId) {
 //        db.update(TABLE_NAME, getContentValues(surveyInfo, null, false), "userId=?", new String[]{userId});
 //    }
+
+    public List<String> getSurveyIds() {
+        List<String> surveyIds = new ArrayList<>();
+        Cursor cursor = db.rawQuery("Select surveyId from " + TABLE_NAME, null);
+        try {
+            while (cursor.moveToNext()) {
+                String surveyId = cursor.getString(cursor.getColumnIndex("surveyId"));
+                surveyIds.add(surveyId);
+            }
+        } finally {
+            cursor.close();
+        }
+        return surveyIds;
+    }
 
     public SurveyInfo getSurveyInfo(String surveyId) {
         List<String> surveyIds = new ArrayList<>();

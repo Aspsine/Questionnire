@@ -40,7 +40,7 @@ public class LogicDao extends AbstractDao<Logic> {
     }
 
     public void save(String surveyId, String questionId, List<Logic> logics) {
-        updateIfFailsInsert(surveyId, questionId, logics);
+        insert(surveyId, questionId, logics);
     }
 
     public void updateIfFailsInsert(String surveyId, String questionId, List<Logic> logics) {
@@ -55,13 +55,14 @@ public class LogicDao extends AbstractDao<Logic> {
         }
     }
 
-//    public void insert(String surveyId, List<Logic> logics) {
-//        ContentValues contentValues = new ContentValues();
-//        for (Logic logic : logics) {
-//            db.insert(TABLE_NAME, null, getContentValues(surveyId, logic, contentValues, true));
-//            contentValues.clear();
-//        }
-//    }
+    public void insert(String surveyId, String questionId, List<Logic> logics) {
+        ContentValues contentValues = new ContentValues();
+        for (Logic logic : logics) {
+            db.insert(TABLE_NAME, null, getContentValues(surveyId, questionId, logic, contentValues, true));
+            contentValues.clear();
+        }
+    }
+
 //
 //    public void delete(String surveyId) {
 //        db.delete(TABLE_NAME, "surveyId =?", new String[]{surveyId});

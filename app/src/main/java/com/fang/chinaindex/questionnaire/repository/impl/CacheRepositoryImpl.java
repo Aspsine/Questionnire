@@ -41,20 +41,6 @@ public class CacheRepositoryImpl implements CacheRepository {
     }
 
     @Override
-    public void saveSurveyInfos(String userId, List<SurveyInfo> surveyInfos) {
-        UserSurveyInfoDao userSurveyInfoDao = daoSession.getUserSurveyInfoDao();
-        SurveyInfoDao surveyInfoDao = daoSession.getSurveyInfoDao();
-        db.beginTransaction();
-        try {
-            surveyInfoDao.save(surveyInfos);
-            userSurveyInfoDao.save(userId, surveyInfos);
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
-    }
-
-    @Override
     public List<SurveyInfo> getSurveyInfos(String userId) {
         UserSurveyInfoDao userSurveyInfoDao = daoSession.getUserSurveyInfoDao();
         SurveyInfoDao surveyInfoDao = daoSession.getSurveyInfoDao();
@@ -85,6 +71,20 @@ public class CacheRepositoryImpl implements CacheRepository {
     }
 
     @Override
+    public List<String> getSurveyIds() {
+        SurveyInfoDao surveyInfoDao = daoSession.getSurveyInfoDao();
+        List<String> surveyIds = null;
+        db.beginTransaction();
+        try {
+            surveyIds = surveyInfoDao.getSurveyIds();
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+        return surveyIds;
+    }
+
+    @Override
     public List<String> getSurveyIds(String userId) {
         UserSurveyInfoDao userSurveyInfoDao = daoSession.getUserSurveyInfoDao();
         List<String> surveyIds = null;
@@ -96,6 +96,18 @@ public class CacheRepositoryImpl implements CacheRepository {
             db.endTransaction();
         }
         return surveyIds;
+    }
+
+    @Override
+    public void linkUserAndSurveyInfo(String userId, String surveyId) {
+        UserSurveyInfoDao userSurveyInfoDao = daoSession.getUserSurveyInfoDao();
+        db.beginTransaction();
+        try {
+            userSurveyInfoDao.save(userId, surveyId);
+            db.setTransactionSuccessful();
+        }finally {
+            db.endTransaction();
+        }
     }
 
     @Override
@@ -111,7 +123,7 @@ public class CacheRepositoryImpl implements CacheRepository {
             for (Survey survey : surveys) {
                 SurveyInfo info = survey.getInfo();
                 //关联表
-                userSurveyInfoDao.save(userId, info);
+                userSurveyInfoDao.save(userId, info.getSurveyId());
                 //保存surveyInfo
                 surveyInfoDao.save(info);
                 //保存questions 通过surveyId关联
@@ -160,38 +172,6 @@ public class CacheRepositoryImpl implements CacheRepository {
             db.endTransaction();
         }
         return survey;
-    }
-
-    @Override
-    public List<Survey> getSurveys(String userId) {
-        UserSurveyInfoDao userSurveyInfoDao = daoSession.getUserSurveyInfoDao();
-        SurveyInfoDao surveyInfoDao = daoSession.getSurveyInfoDao();
-        QuestionDao questionDao = daoSession.getQuestionDao();
-        OptionDao optionDao = daoSession.getOptionDao();
-        LogicDao logicDao = daoSession.getLogicDao();
-        List<Survey> surveys = new ArrayList<Survey>();
-        List<SurveyInfo> surveyInfos = null;
-        db.beginTransaction();
-        try {
-            List<String> surveyIds = userSurveyInfoDao.getSurveyIdsByUserId(userId);
-            surveyInfos = surveyInfoDao.getSurveyInfos(surveyIds);
-            for (SurveyInfo surveyInfo : surveyInfos) {
-                Survey survey = new Survey();
-                survey.setInfo(surveyInfo);
-                List<Question> questions = questionDao.getQuestions(surveyInfo.getSurveyId());
-                for (Question question : questions) {
-                    List<Option> options = optionDao.getOptions(question.getId());
-                    List<Logic> logics = logicDao.getLogics(question.getId());
-                    question.setOptions(options);
-                    question.setLogics(logics);
-                }
-                survey.setQuestions(questions);
-            }
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
-        return surveys;
     }
 
     @Override
