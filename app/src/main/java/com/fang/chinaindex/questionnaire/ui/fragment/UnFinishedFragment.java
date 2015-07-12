@@ -2,7 +2,6 @@ package com.fang.chinaindex.questionnaire.ui.fragment;
 
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -34,6 +33,8 @@ import java.util.List;
  */
 public class UnFinishedFragment extends Fragment implements RecyclerViewAdapter.OnItemClickListener<SurveyInfo>, RecyclerViewAdapter.OnItemLongClickListener<SurveyInfo> {
     public static final String TAG = UnFinishedFragment.class.getSimpleName();
+
+    private static final int REQUEST_CODE_UNFINISHED = 100;
 
     private ActionMode mActionMode;
 
@@ -94,7 +95,7 @@ public class UnFinishedFragment extends Fragment implements RecyclerViewAdapter.
         if (mEditMode) {
             onEditModeListItemClick(position, surveyInfo);
         } else {
-            intentToSurveyActivity(v.getContext(), surveyInfo);
+            intentToSurveyActivity(surveyInfo);
         }
     }
 
@@ -109,6 +110,14 @@ public class UnFinishedFragment extends Fragment implements RecyclerViewAdapter.
         return true;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_UNFINISHED && resultCode == SurveyActivity.RESULT_CODE_SUCCESS) {
+            refresh();
+        }
+    }
+
     private void onEditModeListItemClick(int position, SurveyInfo surveyInfo) {
         toggleItemSelection(position, surveyInfo);
         int selectedCount = mAdapter.getSelectedCount();
@@ -119,11 +128,11 @@ public class UnFinishedFragment extends Fragment implements RecyclerViewAdapter.
         }
     }
 
-    private void intentToSurveyActivity(Context context, SurveyInfo info) {
+    private void intentToSurveyActivity(SurveyInfo info) {
         Intent intent = new Intent(getActivity(), SurveyActivity.class);
         intent.putExtra("EXTRA_SURVEY_ID", String.valueOf(info.getSurveyId()));
         intent.putExtra("EXTRA_SURVEY_START_TIME", info.getStartTime());
-        context.startActivity(intent);
+        startActivityForResult(intent, REQUEST_CODE_UNFINISHED);
     }
 
     /**

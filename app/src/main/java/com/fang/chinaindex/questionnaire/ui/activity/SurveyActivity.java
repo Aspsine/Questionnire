@@ -34,7 +34,7 @@ import java.util.List;
 
 public class SurveyActivity extends BaseActivity implements View.OnClickListener {
     private static final String TAG = SurveyActivity.class.getSimpleName();
-    public static final String START_TIME_NONE = "start_time_none";
+    public static final int RESULT_CODE_SUCCESS = 100;
 
     private Button btnUp, btnNext;
 
@@ -533,7 +533,9 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
         App.getRepository().uploadSample(mUserId, survey, new Repository.Callback<UploadSampleResult>() {
             @Override
             public void success(UploadSampleResult uploadSampleResult) {
+                App.getCacheRepository().deleteAnsweredSurvey(mUserId, mSurveyInfo.getSurveyId(), mSurveyInfo.getStartTime());
                 Toast.makeText(SurveyActivity.this, "upload success!", Toast.LENGTH_SHORT).show();
+                setResult(RESULT_CODE_SUCCESS);
                 finish();
             }
 
