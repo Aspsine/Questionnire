@@ -418,6 +418,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
                 for (Question q : mTemplateQuestions) {
                     if (q.getId().equals(skipToQuestionId)) {
                         i = mTemplateQuestions.indexOf(q);
+                        break;
                     }
                 }
                 if (mCurrentPosition < i) {
@@ -497,7 +498,6 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
                 .setPositiveButton("upload", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(SurveyActivity.this, "upload click", Toast.LENGTH_SHORT).show();
                         uploadSurvey();
                         dialog.dismiss();
                     }
@@ -506,7 +506,6 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(SurveyActivity.this, "cancel click", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
                     }
                 })
