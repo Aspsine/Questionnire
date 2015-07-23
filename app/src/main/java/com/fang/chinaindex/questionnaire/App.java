@@ -9,17 +9,17 @@ import com.fang.chinaindex.questionnaire.db.DBOpenHelper;
 import com.fang.chinaindex.questionnaire.db.DaoMaster;
 import com.fang.chinaindex.questionnaire.db.DaoSession;
 import com.fang.chinaindex.questionnaire.repository.CacheRepository;
-import com.fang.chinaindex.questionnaire.repository.Repository;
+import com.fang.chinaindex.questionnaire.repository.NetRepository;
 import com.fang.chinaindex.questionnaire.repository.impl.CacheRepositoryImpl;
-import com.fang.chinaindex.questionnaire.repository.impl.RepositoryImpl;
+import com.fang.chinaindex.questionnaire.repository.impl.NetRepositoryImpl;
 
 /**
  * Created by aspsine on 15-5-9.
  */
 public class App extends Application {
     private static CacheRepository cacheRepository;
+    private static NetRepository sRepository;
     private static RequestQueue sRequestQueue;
-    private static Repository sRepository;
     private static Context sContext;
 
     @Override
@@ -46,9 +46,9 @@ public class App extends Application {
      * get volley network api access repository
      * @return
      */
-    public static final Repository getRepository() {
+    public static final NetRepository getNetRepository() {
         if (sRepository == null) {
-            sRepository = new RepositoryImpl();
+            sRepository = new NetRepositoryImpl();
         }
         return sRepository;
     }

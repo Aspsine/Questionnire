@@ -18,7 +18,7 @@ import com.fang.chinaindex.questionnaire.App;
 import com.fang.chinaindex.questionnaire.R;
 import com.fang.chinaindex.questionnaire.model.Login;
 import com.fang.chinaindex.questionnaire.model.UserInfo;
-import com.fang.chinaindex.questionnaire.repository.Repository;
+import com.fang.chinaindex.questionnaire.repository.NetRepository;
 import com.fang.chinaindex.questionnaire.ui.activity.MainActivity;
 import com.fang.chinaindex.questionnaire.util.SharedPrefUtils;
 
@@ -144,7 +144,7 @@ public class LoginFragment extends BaseFragment implements View.OnClickListener 
      */
     private void login(String userName, String passWord) {
         show(getString(R.string.login_progressbar_msg));
-        App.getRepository().Login(userName, passWord, new Repository.Callback<Login>() {
+        App.getNetRepository().Login(userName, passWord, new NetRepository.Callback<Login>() {
             @Override
             public void success(Login login) {
                 dismiss();

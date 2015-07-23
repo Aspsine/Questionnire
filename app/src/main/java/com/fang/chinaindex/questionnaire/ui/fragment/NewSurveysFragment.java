@@ -16,7 +16,7 @@ import com.fang.chinaindex.questionnaire.App;
 import com.fang.chinaindex.questionnaire.R;
 import com.fang.chinaindex.questionnaire.model.Survey;
 import com.fang.chinaindex.questionnaire.model.SurveyInfo;
-import com.fang.chinaindex.questionnaire.repository.Repository;
+import com.fang.chinaindex.questionnaire.repository.NetRepository;
 import com.fang.chinaindex.questionnaire.ui.adapter.NewSurveysAdapter;
 import com.fang.chinaindex.questionnaire.util.L;
 import com.fang.chinaindex.questionnaire.util.SharedPrefUtils;
@@ -83,7 +83,7 @@ public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayo
     }
 
     private void refresh() {
-        App.getRepository().getSurveyResults(mUserId, new Repository.Callback<List<SurveyInfo>>() {
+        App.getNetRepository().getSurveyResults(mUserId, new NetRepository.Callback<List<SurveyInfo>>() {
             @Override
             public void success(List<SurveyInfo> surveyInfos) {
                 swipeRefreshLayout.setRefreshing(false);
@@ -134,7 +134,7 @@ public class NewSurveysFragment extends BaseFragment implements SwipeRefreshLayo
             return;
         }
 
-        App.getRepository().getSurveyDetails(SharedPrefUtils.getUserId(getActivity()), newSurveyIds, new Repository.Callback<List<Survey>>() {
+        App.getNetRepository().getSurveyDetails(SharedPrefUtils.getUserId(getActivity()), newSurveyIds, new NetRepository.Callback<List<Survey>>() {
             @Override
             public void success(final List<Survey> surveys) {
 

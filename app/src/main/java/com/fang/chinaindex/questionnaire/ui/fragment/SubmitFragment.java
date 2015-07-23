@@ -26,7 +26,7 @@ import com.fang.chinaindex.questionnaire.model.Question;
 import com.fang.chinaindex.questionnaire.model.Survey;
 import com.fang.chinaindex.questionnaire.model.SurveyInfo;
 import com.fang.chinaindex.questionnaire.model.UploadSampleResult;
-import com.fang.chinaindex.questionnaire.repository.Repository;
+import com.fang.chinaindex.questionnaire.repository.NetRepository;
 import com.fang.chinaindex.questionnaire.ui.activity.SurveyActivity;
 import com.fang.chinaindex.questionnaire.ui.adapter.RecyclerViewAdapter;
 import com.fang.chinaindex.questionnaire.ui.adapter.UnfinishedAdapter;
@@ -176,7 +176,7 @@ public class SubmitFragment extends Fragment implements RecyclerViewAdapter.OnIt
 
     private void upload(final SurveyInfo surveyInfo) {
         List<Question> questions = App.getCacheRepository().getAnsweredQuestions(mUserId, surveyInfo.getSurveyId(), surveyInfo.getStartTime());
-        App.getRepository().uploadSample(mUserId, new Survey(surveyInfo, questions), new Repository.Callback<UploadSampleResult>() {
+        App.getNetRepository().uploadSample(mUserId, new Survey(surveyInfo, questions), new NetRepository.Callback<UploadSampleResult>() {
             @Override
             public void success(UploadSampleResult uploadSampleResult) {
                 mAdapter.remove(surveyInfo);

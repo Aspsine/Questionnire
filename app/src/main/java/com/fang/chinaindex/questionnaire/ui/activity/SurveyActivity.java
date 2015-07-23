@@ -17,7 +17,7 @@ import com.fang.chinaindex.questionnaire.model.Question;
 import com.fang.chinaindex.questionnaire.model.Survey;
 import com.fang.chinaindex.questionnaire.model.SurveyInfo;
 import com.fang.chinaindex.questionnaire.model.UploadSampleResult;
-import com.fang.chinaindex.questionnaire.repository.Repository;
+import com.fang.chinaindex.questionnaire.repository.NetRepository;
 import com.fang.chinaindex.questionnaire.ui.fragment.MultiChoiceFragment;
 import com.fang.chinaindex.questionnaire.ui.fragment.OpenFragment;
 import com.fang.chinaindex.questionnaire.ui.fragment.QuestionBaseFragment;
@@ -529,7 +529,7 @@ public class SurveyActivity extends BaseActivity implements View.OnClickListener
             answeredQuestions.add(question);
         }
         survey.setQuestions(answeredQuestions);
-        App.getRepository().uploadSample(mUserId, survey, new Repository.Callback<UploadSampleResult>() {
+        App.getNetRepository().uploadSample(mUserId, survey, new NetRepository.Callback<UploadSampleResult>() {
             @Override
             public void success(UploadSampleResult uploadSampleResult) {
                 App.getCacheRepository().deleteAnsweredSurvey(mUserId, mSurveyInfo.getSurveyId(), mSurveyInfo.getStartTime());
