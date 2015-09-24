@@ -44,7 +44,7 @@ public class Question {
     @SerializedName("iCatalogID")
     private String catalogId;
     /**
-     *问题排序
+     * 问题排序
      */
     @SerializedName("iSort")
     private String sort;
@@ -68,6 +68,13 @@ public class Question {
      */
     @SerializedName("sCategoryText")
     private String categoryText;
+    /**
+     * 嵌套题类型 与{@link #category} 类型一致
+     *
+     * @see #category
+     */
+    @SerializedName("iNestificationOptionType")
+    private String subQuestionType;
     /**
      * 打分题模版ID（多选，打分题用）
      */
@@ -188,6 +195,14 @@ public class Question {
 
     public void setCategoryText(String categoryText) {
         this.categoryText = categoryText;
+    }
+
+    public String getSubQuestionType() {
+        return subQuestionType;
+    }
+
+    public void setSubQuestionType(String subQuestionType) {
+        this.subQuestionType = subQuestionType;
     }
 
     public String getTemplateId() {

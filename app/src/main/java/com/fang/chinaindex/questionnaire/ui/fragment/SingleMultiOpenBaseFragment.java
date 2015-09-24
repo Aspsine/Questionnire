@@ -15,7 +15,7 @@ import com.fang.chinaindex.questionnaire.ui.adapter.RecyclerViewAdapter;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SingleMultiOpenBaseFragment extends QuestionBaseFragment implements RecyclerViewAdapter.OnItemClickListener<Option> {
+public abstract class SingleMultiOpenBaseFragment extends QuestionBaseFragment implements RecyclerViewAdapter.OnItemClickListener<Option> {
     protected OptionAdapter mAdapter;
 
     public SingleMultiOpenBaseFragment() {
@@ -49,10 +49,4 @@ public class SingleMultiOpenBaseFragment extends QuestionBaseFragment implements
         super.onActivityCreated(savedInstanceState);
         mAdapter.setData(mQuestion.getOptions());
     }
-
-    @Override
-    public void onItemClick(View v, int position, Option option) {
-    }
-
-
 }

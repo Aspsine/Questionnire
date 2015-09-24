@@ -3,6 +3,7 @@ package com.fang.chinaindex.questionnaire.ui.fragment;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.view.View;
 
 import com.fang.chinaindex.questionnaire.model.Option;
 
@@ -16,5 +17,10 @@ public class OpenFragment extends SingleMultiOpenBaseFragment {
         for (Option o : mQuestion.getOptions()) {
             o.setIsOther(true);
         }
+    }
+
+    @Override
+    public void onItemClick(View v, int position, Option option) {
+
     }
 }

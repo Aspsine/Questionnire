@@ -5,12 +5,10 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 /**
- * Created by aspsine on 15/5/12.
- * <p/>
- * change list:
- * 1. add subOptions(2015.09.24)
+ * Created by Aspsine on 2015/9/22.
+ * copy from {@link Option}
  */
-public class Option implements Comparable<Option> {
+public class SubOption implements Comparable<SubOption> {
     @SerializedName("iID")
     private String id;
     @SerializedName("sOptionTitle")
@@ -19,19 +17,14 @@ public class Option implements Comparable<Option> {
     private String sort;
     @SerializedName("bISOther")
     private boolean isOther;
-
-    private String openAnswer;
-
     private List<Scoring> scorings;
-
-    @SerializedName("childrens")
-    private List<SubOption> subOptions;
 
     /**
      * aspsine add inOrder to indicate if the option is a answer;
      */
     private boolean checked;
 
+    private String openAnswer;
 
     public String getId() {
         return id;
@@ -73,22 +66,6 @@ public class Option implements Comparable<Option> {
         this.scorings = scorings;
     }
 
-    public String getOpenAnswer() {
-        return openAnswer;
-    }
-
-    public void setOpenAnswer(String openAnswer) {
-        this.openAnswer = openAnswer;
-    }
-
-    public List<SubOption> getSubOptions() {
-        return subOptions;
-    }
-
-    public void setSubOptions(List<SubOption> subOptions) {
-        this.subOptions = subOptions;
-    }
-
     public boolean isChecked() {
         return checked;
     }
@@ -97,8 +74,17 @@ public class Option implements Comparable<Option> {
         this.checked = checked;
     }
 
+    public String getOpenAnswer() {
+        return openAnswer;
+    }
+
+    public void setOpenAnswer(String openAnswer) {
+        this.openAnswer = openAnswer;
+    }
+
     @Override
-    public int compareTo(Option another) {
+    public int compareTo(SubOption another) {
         return Integer.valueOf(this.sort) - Integer.valueOf(another.sort);
     }
+
 }
